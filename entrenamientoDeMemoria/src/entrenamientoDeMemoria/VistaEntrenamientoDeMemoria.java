@@ -2,6 +2,7 @@ package entrenamientoDeMemoria;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -9,7 +10,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -26,7 +26,9 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         initGUI(); // graphic components are created here.
 
         this.setTitle("Entrenamiento de memoria");
-        this.setSize(800,500);; // modify the size of the JFrame.
+        // this.setSize(800, 500);
+        // this.pack();
+        ; // modify the size of the JFrame.
         this.setLocationRelativeTo(null); // null -> muestra la ventana centrada
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // al cerrar la ventana se termina la ejecución del
@@ -56,11 +58,14 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private void mostrarCartas() {
         ArrayList<Integer> cartas = control.revolverCartas();
 
+        this.setSize(180 * cartas.size() / 2, 360);
+
         for (int i = 0; i < cartas.size(); i++) {
-            cartasLabel[i].setIcon(new ImageIcon("src/images/" + cartas.get(i) + ".png"));
+            cartasLabel[i].setIcon(
+                    new ImageIcon(new ImageIcon(this.getClass().getResource("/images/" + cartas.get(i) + ".png"))
+                            .getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
             cartasLabel[i].setMaximumSize(new Dimension(20, 20));
-            ImageIcon ff = new ImageIcon();
-            
+
             add(cartasLabel[i]);
         }
 
@@ -82,31 +87,26 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
