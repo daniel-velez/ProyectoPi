@@ -6,11 +6,11 @@ public class ControlEntrenamientoDeMemoria {
 
 	private int complejidad;
 	private int tiempoDeEspera;
-	private int cartaGanadora;
+	private int cartaGanadora = 2;
 
 	public ControlEntrenamientoDeMemoria() {
 		complejidad = 4;
-		tiempoDeEspera = 15;
+		tiempoDeEspera = 1000;
 	}
 
 	public ArrayList<Integer> revolverCartas() {
@@ -33,14 +33,17 @@ public class ControlEntrenamientoDeMemoria {
 	}
 
 	public int getTiempoDeEspera() {
-
 		return tiempoDeEspera;
 	}
 
 	public boolean determinarRonda(int cartaSeleccionada) {
-
-		boolean estado = true;
-		return estado;
+		if (cartaSeleccionada == cartaGanadora) {
+			if (complejidad < 12)
+				complejidad += 2;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
