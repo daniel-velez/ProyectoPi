@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -34,7 +35,7 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         initGUI(); // graphic components are created here.
 
         this.setTitle("Entrenamiento de memoria");
-        this.setSize(800, 500);
+        this.setSize(800, 650);
         // this.pack();
         ; // modify the size of the JFrame.
         this.setLocationRelativeTo(null); // null -> muestra la ventana centrada
@@ -46,50 +47,63 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
     private void initGUI() {
         this.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        GridBagConstraints constraints = new GridBagConstraints();
 
         // crear objeto escucha y objeto control
         listener = new Escucha();
         control = new ControlEntrenamientoDeMemoria();
 
-        zonaJuego = new JPanel();
-        zonaJuego.setPreferredSize(new Dimension(550, 500));
-        zonaJuego.setBackground(new Color(255, 0, 0));
-        zonaJuego.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        // #---------------------------------------------------------------------------
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.weighty = 1.0;
-        constraints.weightx = 1.0;
+        zonaJuego = new JPanel();
+        zonaJuego.setPreferredSize(new Dimension(700, 650));
+        zonaJuego.setBackground(new Color(240, 240, 240));
+        zonaJuego.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         add(zonaJuego);
-        constraints.weighty = 0.0;
-        constraints.weightx = 0.0;
 
         zonaIndicaciones = new JPanel();
-        zonaIndicaciones.setPreferredSize(new Dimension(234, 500));
+        zonaIndicaciones.setPreferredSize(new Dimension(84, 650));// 234
         zonaIndicaciones.setBackground(new Color(255, 255, 0));
         zonaIndicaciones.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 1.0;
-        constraints.weighty = 1.0;
-        constraints.fill = GridBagConstraints.BOTH;
         add(zonaIndicaciones);
 
-        timerOcultarCartas = new Timer(control.getTiempoDeEspera(), listener);
+        // #---------------------------------------------------------------------------
+
+        zonaJuego.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        // definir los tamaños definitos de las imagenes
+        // poner el caso 4 y caso 6, 9 con imagenes más grandes
+        // encargarnos de las margenes
 
         cartasLabel = new JLabel[12];
-        for (int i = 0; i < 12; i++)
-            cartasLabel[i] = new JLabel();
+        // mostrarAbstractCartas(4, 2, java.util.Collections.emptyList());
+        // mostrarAbstractCartas(6, 3, java.util.Collections.emptyList());
+        // mostrarAbstractCartas(9, 3, java.util.Arrays.asList(new Integer[] { 4 }));
+        // mostrarAbstractCartas(12, 4, java.util.Arrays.asList(new Integer[] { 5, 6
+        // }));
+        mostrarAbstractCartas(12, 4, java.util.Collections.emptyList());
 
-        mostrarCartas();
+        // #---------------------------------------------------------------------------
+
+        // timerOcultarCartas = new Timer(control.getTiempoDeEspera(), listener);
+
+        // mostrarCartas();
+    }
+
+    private void mostrarAbstractCartas(int numeroDeCeldas, int columnas, List<Integer> restricciones) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        for (int i = 0; i < numeroDeCeldas; i++) {
+            if (restricciones.indexOf(i) != -1)
+                continue;
+
+            constraints.gridx = i % columnas;
+            constraints.gridy = (int) Math.floor(i / columnas);
+            constraints.gridwidth = 1;
+            constraints.gridheight = 1;
+            cartasLabel[i] = new JLabel();
+            cartasLabel[i].setIcon(new ImageIcon(this.getClass().getResource("/images/2.png")));
+            zonaJuego.add(cartasLabel[i], constraints);
+        }
     }
 
     private void mostrarCartas() {
@@ -103,8 +117,9 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
                     new ImageIcon(new ImageIcon(this.getClass().getResource("/images/" + cartas.get(i) + ".png"))
                             .getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
             zonaJuego.add(cartasLabel[i]);
-        }
 
+        }
+        // add(zonaJuego);
         timerOcultarCartas.setDelay(control.getTiempoDeEspera());
         timerOcultarCartas.start();
     }
