@@ -6,11 +6,11 @@ public class ControlEntrenamientoDeMemoria {
 
 	private int complejidad;
 	private int tiempoDeEspera;
-	private int cartaGanadora = 2;
+	private int cartaGanadora;
 
 	public ControlEntrenamientoDeMemoria() {
 		complejidad = 4;
-		tiempoDeEspera = 1000;
+		tiempoDeEspera = 5000;
 	}
 
 	public ArrayList<Integer> revolverCartas() {
@@ -29,6 +29,8 @@ public class ControlEntrenamientoDeMemoria {
 			cartas.remove(cartaSeleccionada);
 		}
 
+		cartaGanadora = seleccionadas.get((int) (Math.random() * complejidad));
+
 		return seleccionadas;
 	}
 
@@ -44,6 +46,10 @@ public class ControlEntrenamientoDeMemoria {
 		} else {
 			return false;
 		}
+	}
+
+	public int getCartaGanadora() {
+		return cartaGanadora;
 	}
 
 }
