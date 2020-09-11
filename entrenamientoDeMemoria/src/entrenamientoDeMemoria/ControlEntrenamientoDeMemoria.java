@@ -7,16 +7,17 @@ public class ControlEntrenamientoDeMemoria {
 	private int complejidad;
 	private int tiempoDeEspera;
 	private int cartaGanadora;
+	private ArrayList<Integer> seleccionadas;
 
 	public ControlEntrenamientoDeMemoria() {
 		complejidad = 4;
-		tiempoDeEspera = 15;
+		tiempoDeEspera = 5000;
 	}
 
 	public ArrayList<Integer> revolverCartas() {
 		// inicializar el ArrayList<Integer> con la cantidad de imagenes a devolver
 		ArrayList<Integer> cartas = new ArrayList<Integer>();
-		ArrayList<Integer> seleccionadas = new ArrayList<Integer>();
+		seleccionadas = new ArrayList<Integer>();
 		cartas.ensureCapacity(12);
 
 		for (int j = 1; j <= 12; j++)
@@ -29,18 +30,27 @@ public class ControlEntrenamientoDeMemoria {
 			cartas.remove(cartaSeleccionada);
 		}
 
+		cartaGanadora = (int) (Math.random() * complejidad);
+
 		return seleccionadas;
 	}
 
 	public int getTiempoDeEspera() {
-
 		return tiempoDeEspera;
 	}
 
-	public boolean determinarRonda(int cartaSeleccionada) {
+	public boolean determinarRonda(int carta) {
+		if (carta == cartaGanadora) {
+			if (complejidad < 12)
+				complejidad += 2;
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-		boolean estado = true;
-		return estado;
+	public int getCartaGanadora() {
+		return seleccionadas.get(cartaGanadora);
 	}
 
 }
