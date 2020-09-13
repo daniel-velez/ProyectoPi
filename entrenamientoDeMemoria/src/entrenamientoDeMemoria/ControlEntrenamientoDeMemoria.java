@@ -11,7 +11,7 @@ public class ControlEntrenamientoDeMemoria {
 
 	public ControlEntrenamientoDeMemoria() {
 		complejidad = 4;
-		tiempoDeEspera = 5000;
+		tiempoDeEspera = 1000;
 	}
 
 	public ArrayList<Integer> revolverCartas() {

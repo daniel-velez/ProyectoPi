@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -40,12 +41,12 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private Escucha listener;
     private ControlEntrenamientoDeMemoria control;
     private JLabel[] cartasLabel;
-    private Timer timerOcultarCartas;
+    private Timer timer;
     private ArrayList<Integer> cartas;
     private JPanel zonaJuego, zonaIndicaciones;
-    private JLabel cartaGanadora;
-    private JTextArea indicaciones;
-    private JTextArea instrucciones;
+    private JLabel cartaGanadora, ganastePerdiste, contador, siguienteRonda;
+    private JTextArea indicaciones, instrucciones;
+    private boolean finDeRonda;
 
     private InputStream loadFont;
     private Font zorqueFont;
@@ -71,10 +72,12 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         control = new ControlEntrenamientoDeMemoria();
         listener = new Escucha();
         cartasLabel = new JLabel[12];
+        ganastePerdiste = new JLabel();
+        contador = new JLabel();
 
         // #---------------------------------------------------------------------------
 
-        loadFont = getClass().getResourceAsStream("/fonts/MaldiniNormal-ZVKG3.ttf");
+        loadFont = getClass().getResourceAsStream("/fonts/Niagaraphobia-Bro3.ttf");
         try {
             zorqueFont = Font.createFont(Font.TRUETYPE_FONT, loadFont);
         } catch (FontFormatException e) {
@@ -85,13 +88,11 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
         zonaJuego = new JPanel();
         zonaJuego.setPreferredSize(new Dimension(730, 521));
-        zonaJuego.setBackground(new Color(42, 69, 78)); // 0, 233, 211
-        zonaJuego.setLayout(new GridBagLayout());
         add(zonaJuego);
 
         zonaIndicaciones = new JPanel();
         zonaIndicaciones.setPreferredSize(new Dimension(210, 521));
-        zonaIndicaciones.setBackground(new Color(245, 245, 245));
+        zonaIndicaciones.setBackground(new Color(255, 255, 255));
         add(zonaIndicaciones);
 
         // #---------------------------------------------------------------------------
@@ -103,7 +104,7 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
         indicaciones = new JTextArea("Encuentra esta carta");
         indicaciones.setFont(zorqueFont.deriveFont(20f));
-        indicaciones.setBackground(new Color(245, 245, 245));
+        indicaciones.setBackground(new Color(255, 255, 255));
         indicaciones.setEditable(false);
         zonaIndicaciones.add(indicaciones);
 
@@ -111,14 +112,23 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
                 + "\n Selecciona la carta\n correcta para \navanzar a la\n siguiente ronda."
                 + "\nUna vez completada\n la ronda 12\n ganas el juego.");
         instrucciones.setFont(zorqueFont.deriveFont(14f));
-        instrucciones.setBackground(new Color(245, 245, 245));
+        instrucciones.setBackground(new Color(255, 255, 255));
         instrucciones.setBorder(new EmptyBorder(25, 0, 0, 0));
         instrucciones.setEditable(false);
         zonaIndicaciones.add(instrucciones);
 
+        ganastePerdiste.setFont(zorqueFont.deriveFont(100f));
+        ganastePerdiste.setBounds(0, 130, 730, 100);
+        ganastePerdiste.setHorizontalAlignment(SwingConstants.CENTER);
+
+        siguienteRonda = new JLabel("La siguiente ronda comenzará en...");
+        siguienteRonda.setFont(zorqueFont.deriveFont(20f));
+        siguienteRonda.setBounds(0, 210, 730, 100);
+        siguienteRonda.setHorizontalAlignment(SwingConstants.CENTER);
+
         // #---------------------------------------------------------------------------
 
-        timerOcultarCartas = new Timer(control.getTiempoDeEspera(), listener);
+        timer = new Timer(control.getTiempoDeEspera(), listener);
         mostrarCartas();
     }
 
@@ -146,7 +156,10 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
     private void mostrarCartas() {
         cartas = control.revolverCartas();
+        finDeRonda = false;
 
+        zonaJuego.setLayout(new GridBagLayout());
+        zonaJuego.setBackground(new Color(42, 69, 78)); // 0, 233, 211
         zonaJuego.removeAll();
         zonaJuego.revalidate();
         zonaJuego.repaint();
@@ -162,8 +175,8 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         else if (cartas.size() == 12)
             mostrarAbstractCartas(12, 4, java.util.Collections.emptyList());
 
-        timerOcultarCartas.setDelay(control.getTiempoDeEspera());
-        timerOcultarCartas.start();
+        timer.setDelay(control.getTiempoDeEspera());
+        timer.start();
     }
 
     private void ocultarCartas() {
@@ -175,17 +188,42 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
             cartasLabel[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
 
-        cartaGanadora.setIcon(getImage(Integer.toString(control.getCartaGanadora()), 150));
-        timerOcultarCartas.stop();
+        // cartaGanadora.setIcon(getImage(Integer.toString(control.getCartaGanadora()),
+        // 150));
+        timer.stop();
         zonaIndicaciones.add(indicaciones);
     }
 
     private void determinarJuego(int carta) {
-        if (control.determinarRonda(carta)) {
-            mostrarCartas();
+        showFinDeRonda(control.determinarRonda(carta));
+    }
+
+    private void showFinDeRonda(boolean ganaste) {
+        if (ganaste) {
+            ganastePerdiste.setText("¡Ganaste!");
+            ganastePerdiste.setForeground(new Color(180, 230, 47));
         } else {
-            mostrarCartas();
+            ganastePerdiste.setText("Carta equivocada... :(");
+            ganastePerdiste.setForeground(new Color(215, 14, 14));
         }
+
+        contador.setText("5");
+        contador.setFont(zorqueFont.deriveFont(30f));
+        contador.setBounds(0, 250, 730, 100);
+        contador.setHorizontalAlignment(SwingConstants.CENTER);
+
+        zonaJuego.setBackground(Color.WHITE);
+        zonaJuego.setLayout(null);
+        zonaJuego.removeAll();
+        zonaJuego.revalidate();
+        zonaJuego.repaint();
+        zonaJuego.add(ganastePerdiste);
+        zonaJuego.add(siguienteRonda);
+        zonaJuego.add(contador);
+
+        finDeRonda = true;
+        timer.setDelay(1000);
+        timer.start();
     }
 
     // #---------------------------------------------------------------------------
@@ -215,8 +253,13 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (event.getSource() == timerOcultarCartas)
-                ocultarCartas();
+            if (event.getSource() == timer)
+                if (!finDeRonda)
+                    ocultarCartas();
+                else if (new Integer(contador.getText()) == 0)
+                    mostrarCartas();
+                else
+                    contador.setText(((Integer) (new Integer(contador.getText()) - 1)).toString());
 
         }
 
