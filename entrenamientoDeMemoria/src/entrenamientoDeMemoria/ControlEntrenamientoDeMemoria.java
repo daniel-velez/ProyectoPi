@@ -29,7 +29,7 @@ public class ControlEntrenamientoDeMemoria {
 	 */
 	public ControlEntrenamientoDeMemoria() {
 		complejidad = 4;
-		tiempoDeEspera = 4;
+		tiempoDeEspera = 15;
 	}
 
 	/**
@@ -77,12 +77,15 @@ public class ControlEntrenamientoDeMemoria {
 	 */
 	public boolean determinarRonda(int carta) {
 		if (carta == cartaGanadora) {
-			if (complejidad < 12)
+			if (complejidad < 12) {
 				complejidad += 2;
+				tiempoDeEspera -= 1;
+				if (complejidad == 12)
+					tiempoDeEspera -= 1;
+			}
 			return true;
-		} else {
+		} else
 			return false;
-		}
 	}
 
 	/**

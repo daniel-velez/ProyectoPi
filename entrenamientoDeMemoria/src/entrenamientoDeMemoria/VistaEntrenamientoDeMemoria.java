@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Arrays;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,18 +44,19 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private Timer timer;
     private ArrayList<Integer> cartas;
     private JPanel zonaJuego, zonaIndicaciones;
-    private JLabel cartaGanadora, ganastePerdiste, contador, siguienteRonda;
-    private JTextArea indicaciones;
+    private JLabel cartaGanadora, ganastePerdiste, contador, contadorCero, siguienteRondaText, indicaciones, separador;
     private JTextPane instrucciones;
     private Map<Integer, PanelProperties> panelPropertiesByCartasSize;
-    private boolean finDeRonda;
+    private boolean siguienteRonda;
+    private List<Color> bgcolorZonaJuego;
 
     private InputStream loadFont;
     private Font niagaraphobia;
-    private final int TIEMPO_DE_ESPERA = 2;
+    private final int TIEMPO_DE_ESPERA = 5;
 
     // metodos
     VistaEntrenamientoDeMemoria() {
+        // propiedades para cada panel de cartas, en función de las cartas a mostrar
         panelPropertiesByCartasSize = new HashMap<>();
         panelPropertiesByCartasSize.put(4, new PanelProperties(4, 2, null, 225));
         panelPropertiesByCartasSize.put(6, new PanelProperties(6, 3, null, 200));
@@ -62,13 +64,27 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         panelPropertiesByCartasSize.put(10, new PanelProperties(12, 4, Arrays.asList(new Integer[] { 5, 6 }), 150));
         panelPropertiesByCartasSize.put(12, new PanelProperties(12, 4, null, 150));
 
+        // colores de fondo para la zona de juego
+        bgcolorZonaJuego = new ArrayList<Color>();
+        bgcolorZonaJuego.add(new Color(243, 105, 26));
+        bgcolorZonaJuego.add(new Color(42, 69, 78));
+        bgcolorZonaJuego.add(new Color(212, 31, 31));
+        bgcolorZonaJuego.add(new Color(187, 212, 51));
+        bgcolorZonaJuego.add(new Color(24, 219, 151));
+        bgcolorZonaJuego.add(new Color(222, 69, 124));
+        bgcolorZonaJuego.add(new Color(160, 82, 45));
+        bgcolorZonaJuego.add(new Color(255, 140, 0));
+
+        siguienteRonda = false;
+
         initGUI();
 
-        this.setTitle("Entrenamiento de memoria");
+        this.setTitle("Delicious Memory");
         this.setSize(956, 560);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setIconImage(new ImageIcon(getClass().getResource("/images/hamburguesa.png")).getImage());
         this.setVisible(true);
     }
 
@@ -77,14 +93,14 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
         control = new ControlEntrenamientoDeMemoria();
         listener = new Escucha();
+        timer = new Timer(1000, listener);
         cartasLabel = new JLabel[12];
-        ganastePerdiste = new JLabel();
-        contador = new JLabel();
 
         for (int i = 0; i < 12; i++)
             cartasLabel[i] = new JLabel();
 
         // #---------------------------------------------------------------------------
+        // # Fuente
 
         loadFont = getClass().getResourceAsStream("/fonts/Niagaraphobia-Bro3.ttf");
         try {
@@ -94,6 +110,7 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         }
 
         // #---------------------------------------------------------------------------
+        // # Paneles
 
         zonaJuego = new JPanel();
         zonaJuego.setPreferredSize(new Dimension(730, 521));
@@ -105,18 +122,17 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         add(zonaIndicaciones);
 
         // #---------------------------------------------------------------------------
+        // # Zona Indicaciones
 
         cartaGanadora = new JLabel();
-        cartaGanadora.setBorder(new EmptyBorder(25, 0, 0, 0));
+        cartaGanadora.setBorder(new EmptyBorder(25, 0, 5, 0));
         zonaIndicaciones.add(cartaGanadora);
 
-        indicaciones = new JTextArea("¡Mira estas delicias!");
+        indicaciones = new JLabel("¡Mira estas delicias!");
         indicaciones.setFont(niagaraphobia.deriveFont(24f));
-        indicaciones.setBackground(new Color(255, 255, 255));
-        indicaciones.setEditable(false);
         zonaIndicaciones.add(indicaciones);
 
-        JLabel separador = new JLabel("       _____________________________");
+        separador = new JLabel("       _____________________________");
         separador.setFont(new Font("Arial", Font.BOLD, 35));
         separador.setForeground(new Color(255, 87, 51));
         zonaIndicaciones.add(separador);
@@ -132,49 +148,52 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
 
-        instrucciones.setBorder(new EmptyBorder(20, 0, 0, 0));
+        instrucciones.setBorder(new EmptyBorder(15, 20, 16, 20));
         instrucciones.setEditable(false);
         instrucciones.setForeground(new Color(100, 100, 100));
         instrucciones.setHighlighter(null);
         zonaIndicaciones.add(instrucciones);
 
+        contador = new JLabel();
+        contador.setFont(niagaraphobia.deriveFont(30f));
+        contador.setHorizontalAlignment(SwingConstants.CENTER);
+
+        contadorCero = new JLabel("0");
+        contadorCero.setFont(niagaraphobia.deriveFont(30f));
+
+        // #---------------------------------------------------------------------------
+        // # Fin de Ronda
+
+        ganastePerdiste = new JLabel();
         ganastePerdiste.setFont(niagaraphobia.deriveFont(100f));
-        ganastePerdiste.setBounds(0, 130, 730, 100);
+        ganastePerdiste.setBounds(30, 150, 730, 100);
         ganastePerdiste.setHorizontalAlignment(SwingConstants.CENTER);
 
-        siguienteRonda = new JLabel("La siguiente ronda comenzará en...");
-        siguienteRonda.setFont(niagaraphobia.deriveFont(20f));
-        siguienteRonda.setBounds(0, 210, 730, 100);
-        siguienteRonda.setHorizontalAlignment(SwingConstants.CENTER);
+        siguienteRondaText = new JLabel("La siguiente ronda comenzará en...");
+        siguienteRondaText.setFont(niagaraphobia.deriveFont(20f));
+        siguienteRondaText.setBounds(30, 230, 730, 100);
+        siguienteRondaText.setHorizontalAlignment(SwingConstants.CENTER);
 
         // #---------------------------------------------------------------------------
 
-        timer = new Timer(1000, listener);
         mostrarCartas();
     }
 
     private void mostrarCartas() {
         cartas = control.revolverCartas();
-        cartaGanadora.setIcon(getImage("ojo", 150));
-        finDeRonda = false;
 
-        indicaciones.setText("¡Mira estas delicias!");
-        indicaciones.setFont(niagaraphobia.deriveFont(24f));
-
+        // # Zona Juego
         zonaJuego.setLayout(new GridBagLayout());
-        zonaJuego.setBackground(new Color(42, 69, 78)); // 0, 233, 211
-        zonaJuego.removeAll();
-        zonaJuego.revalidate();
-        zonaJuego.repaint();
+        zonaJuego.setBackground(bgcolorZonaJuego.get((int) (Math.random() * 8)));
+        refreshZonaJuego();
 
         mostrarPanelDeCartas(panelPropertiesByCartasSize.get(cartas.size()));
 
+        // # Zona Indicaciones
+        cartaGanadora.setIcon(getImage("ojo", 150));
+        indicaciones.setText("¡Mira estas delicias!");
         contador.setText(String.valueOf(control.getTiempoDeEspera()));
-        contador.setFont(niagaraphobia.deriveFont(30f));
-        contador.setBorder(new EmptyBorder(20, 0, 0, 0));
-        contador.setMinimumSize(new Dimension(210, 37));
-        contador.setPreferredSize(new Dimension(210, 37));
-        contador.setHorizontalAlignment(SwingConstants.CENTER);
+        zonaIndicaciones.remove(contadorCero);
         zonaIndicaciones.add(contador);
 
         timer.start();
@@ -196,6 +215,7 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
             cartasLabel[i]
                     .setBorder(cartas.size() == 8 ? new EmptyBorder(10, 25, 10, 25) : new EmptyBorder(10, 10, 10, 10));
             cartasLabel[i].setIcon(getImage("C" + props.size + "." + cartas.get(getCartaIndex(i)), props.size));
+            cartasLabel[i].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             zonaJuego.add(cartasLabel[i], constraints);
         }
@@ -204,18 +224,19 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private void ocultarCartas() {
         PanelProperties props = panelPropertiesByCartasSize.get(cartas.size());
 
+        // # Zona Juego
         for (int i = 0; i < props.numeroDeCeldas; i++) {
             if (props.restricciones.indexOf(i) != -1)
                 continue;
 
-            cartasLabel[i].setIcon(getImage("H" + props.size + "." + getCartaIndex(i + 1), props.size));
             cartasLabel[i].addMouseListener(listener);
+            cartasLabel[i].setIcon(getImage("H" + props.size + "." + getCartaIndex(i + 1), props.size));
             cartasLabel[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
 
+        // # Zona Indicaciones
         cartaGanadora.setIcon(getImage("C150." + control.getCartaGanadora(), 150));
         indicaciones.setText("¿En dónde estaba... ?");
-        indicaciones.setFont(niagaraphobia.deriveFont(24f));
     }
 
     private void determinarJuego(int carta) {
@@ -228,20 +249,17 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         }
 
         contador.setText(String.valueOf(TIEMPO_DE_ESPERA));
-        contador.setFont(niagaraphobia.deriveFont(30f));
-        contador.setBounds(0, 250, 730, 100);
-        contador.setHorizontalAlignment(SwingConstants.CENTER);
+        contador.setBounds(30, 270, 730, 100);
 
         zonaJuego.setBackground(Color.WHITE);
         zonaJuego.setLayout(null);
-        zonaJuego.removeAll();
-        zonaJuego.revalidate();
-        zonaJuego.repaint();
+        refreshZonaJuego();
         zonaJuego.add(ganastePerdiste);
-        zonaJuego.add(siguienteRonda);
+        zonaJuego.add(siguienteRondaText);
         zonaJuego.add(contador);
+        zonaIndicaciones.add(contadorCero);
 
-        finDeRonda = true;
+        siguienteRonda = true;
         timer.start();
     }
 
@@ -249,19 +267,25 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     // # FUNCIONES AUXILIARES
     // #---------------------------------------------------------------------------
 
-    private int getCartaIndex(int i) {
+    private int getCartaIndex(int numeroDeCelda) {
         if (cartas.size() == 8)
-            if (i > 4)
-                return i - 1;
+            if (numeroDeCelda > 4)
+                return numeroDeCelda - 1;
         if (cartas.size() == 10)
-            if (i > 6)
-                return i - 2;
-        return i;
+            if (numeroDeCelda > 6)
+                return numeroDeCelda - 2;
+        return numeroDeCelda;
     }
 
     private ImageIcon getImage(String name, int size) {
         return new ImageIcon(new ImageIcon(this.getClass().getResource("/images/" + name + ".png")).getImage()
                 .getScaledInstance(size, size, Image.SCALE_DEFAULT));
+    }
+
+    private void refreshZonaJuego() {
+        zonaJuego.removeAll();
+        zonaJuego.revalidate();
+        zonaJuego.repaint();
     }
 
     // #---------------------------------------------------------------------------
@@ -273,25 +297,26 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (event.getSource() == timer)
+                // si el contador está en 0
                 if (Integer.parseInt(contador.getText()) == 0) {
                     timer.stop();
-                    if (finDeRonda)
+                    if (siguienteRonda) {
                         mostrarCartas();
-                    else
+                        siguienteRonda = false;
+                    } else
                         ocultarCartas();
                 } else
+                    // reducir el contador en 1
                     contador.setText(String.valueOf(Integer.parseInt(contador.getText()) - 1));
-
         }
 
         @Override
         public void mouseClicked(MouseEvent event) {
-            for (int i = 0; i < cartas.size(); i++)
+            for (int i = 0; i < 12; i++)
                 if (event.getSource() == cartasLabel[i]) {
-                    determinarJuego(i);
+                    determinarJuego(getCartaIndex(i));
                     break;
                 }
-
         }
 
         @Override
@@ -316,6 +341,10 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
 
     }
 
+    // #---------------------------------------------------------------------------
+    // # STRUCTURES
+    // #---------------------------------------------------------------------------
+
     private class PanelProperties {
         public int numeroDeCeldas;
         public int columnas;
@@ -329,4 +358,5 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
             this.size = size;
         }
     }
+
 }
