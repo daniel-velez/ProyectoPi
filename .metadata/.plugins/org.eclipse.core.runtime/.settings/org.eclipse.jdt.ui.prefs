@@ -1,0 +1,7 @@
+command=/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/javadoc
+content_assist_number_of_computers=13
+eclipse.preferences.version=1
+org.eclipse.jdt.ui.formatterprofiles.version=19
+spelling_locale_initialized=true
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true
