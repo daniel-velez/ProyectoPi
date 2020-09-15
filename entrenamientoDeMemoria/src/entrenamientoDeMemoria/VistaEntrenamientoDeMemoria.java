@@ -1,3 +1,10 @@
+/*
+ * Programación Interactiva
+ * Autor: Julián Andrés Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Vélez Cuaical - 1924306
+ * Mini proyecto 1: Juego de entrenamiento de memoria
+ */
+
 package entrenamientoDeMemoria;
 
 import java.awt.Color;
@@ -36,7 +43,12 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class VistaEntrenamientoDeMemoria. Clase encargada de realizar las operaciones de E/S por medio una ventana (JFrame).
+ */
 public class VistaEntrenamientoDeMemoria extends JFrame {
+    
     // atributos
     private Escucha listener;
     private ControlEntrenamientoDeMemoria control;
@@ -49,14 +61,18 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private Map<Integer, PanelProperties> panelPropertiesByCartasSize;
     private boolean siguienteRonda;
     private List<Color> bgcolorZonaJuego;
-
+    
     private InputStream loadFont;
     private Font niagaraphobia;
     private final int TIEMPO_DE_ESPERA = 5;
-
+    
     // metodos
+    
+    /**
+     * Instantiates a new vista entrenamiento de memoria. Constructor de la clase. Inicializa los atributos de la clase (auxiliares y componentes graficos) y realiza la configuracion de la ventana principal.
+     */
     VistaEntrenamientoDeMemoria() {
-        // propiedades para cada panel de cartas, en función de las cartas a mostrar
+        // propiedades para cada panel de cartas, en funcion de las cartas a mostrar
         panelPropertiesByCartasSize = new HashMap<>();
         panelPropertiesByCartasSize.put(4, new PanelProperties(4, 2, null, 225));
         panelPropertiesByCartasSize.put(6, new PanelProperties(6, 3, null, 200));
@@ -76,9 +92,10 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         bgcolorZonaJuego.add(new Color(255, 140, 0));
 
         siguienteRonda = false;
-
+        
         initGUI();
 
+        // establecer la configuración de ventana predeterminada.
         this.setTitle("Delicious Memory");
         this.setSize(956, 560);
         this.setLocationRelativeTo(null);
@@ -88,14 +105,20 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * Inits the GUI. Inicializa la interfaz grafica. Se configuran y crean el container, los objetos, y los componentes graficos.
+     */
     private void initGUI() {
+    	
+    	// configurar el container de la ventana y su layout.
         this.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-
+        
+        // se crean los objetos escucha, control y otros.
         control = new ControlEntrenamientoDeMemoria();
         listener = new Escucha();
         timer = new Timer(1000, listener);
         cartasLabel = new JLabel[12];
-
+        
         for (int i = 0; i < 12; i++)
             cartasLabel[i] = new JLabel();
 
@@ -179,6 +202,9 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         mostrarCartas();
     }
 
+    /**
+     * Mostrar cartas. Configura la zonaJuego y zonaIndicaciones al iniciar una ronda.
+     */
     private void mostrarCartas() {
         cartas = control.revolverCartas();
 
@@ -199,6 +225,11 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         timer.start();
     }
 
+    /**
+     * Mostrar panel de cartas. Agrega las cartas a la zonaJuego de acuerdo a las propiedades especificadas.
+     *
+     * @param props the props
+     */
     private void mostrarPanelDeCartas(PanelProperties props) {
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -221,6 +252,9 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         }
     }
 
+    /**
+     * Ocultar cartas. Cambia las imagenes de las cartas por imagenes con numeros,  agrega la carta a buscar y las indicaciones a zonaIndicaciones.
+     */
     private void ocultarCartas() {
         PanelProperties props = panelPropertiesByCartasSize.get(cartas.size());
 
@@ -239,6 +273,11 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         indicaciones.setText("¿En dónde estaba... ?");
     }
 
+    /**
+     * Determinar juego. Determina si se gana o pierde una ronda de acuerdo a la carta especificada.
+     *
+     * @param carta the carta
+     */
     private void determinarJuego(int carta) {
         if (control.determinarRonda(carta)) {
             ganastePerdiste.setText("¡Ganaste!");
@@ -267,6 +306,12 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     // # FUNCIONES AUXILIARES
     // #---------------------------------------------------------------------------
 
+    /**
+     * Gets the carta index. Retorna el indice de una carta de acuerdo a un numeroDeCelda.
+     *
+     * @param numeroDeCelda the numero de celda
+     * @return the carta index
+     */
     private int getCartaIndex(int numeroDeCelda) {
         if (cartas.size() == 8)
             if (numeroDeCelda > 4)
@@ -277,11 +322,21 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
         return numeroDeCelda;
     }
 
+    /**
+     * Gets the image. Retorna un ImageIcon con una imagen y dimension especificadas.
+     *
+     * @param name the name
+     * @param size the size
+     * @return the image
+     */
     private ImageIcon getImage(String name, int size) {
         return new ImageIcon(new ImageIcon(this.getClass().getResource("/images/" + name + ".png")).getImage()
                 .getScaledInstance(size, size, Image.SCALE_DEFAULT));
     }
 
+    /**
+     * Refresh zona juego. Actualiza la zona de juego quitando los componentes anteriores.
+     */
     private void refreshZonaJuego() {
         zonaJuego.removeAll();
         zonaJuego.revalidate();
@@ -292,8 +347,16 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     // # LISTENER
     // #---------------------------------------------------------------------------
 
+    /**
+     * The Class Escucha. Clase interna encargada de manejar los eventos de la ventana.
+     */
     private class Escucha implements ActionListener, MouseListener {
 
+        /**
+         * Action performed.
+         *
+         * @param event the event
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             if (event.getSource() == timer)
@@ -310,6 +373,11 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
                     contador.setText(String.valueOf(Integer.parseInt(contador.getText()) - 1));
         }
 
+        /**
+         * Mouse clicked.
+         *
+         * @param event the event
+         */
         @Override
         public void mouseClicked(MouseEvent event) {
             for (int i = 0; i < 12; i++)
@@ -319,21 +387,41 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
                 }
         }
 
+        /**
+         * Mouse pressed.
+         *
+         * @param e the e
+         */
         @Override
         public void mousePressed(MouseEvent e) {
 
         }
 
+        /**
+         * Mouse released.
+         *
+         * @param e the e
+         */
         @Override
         public void mouseReleased(MouseEvent e) {
 
         }
 
+        /**
+         * Mouse entered.
+         *
+         * @param e the e
+         */
         @Override
         public void mouseEntered(MouseEvent e) {
 
         }
 
+        /**
+         * Mouse exited.
+         *
+         * @param e the e
+         */
         @Override
         public void mouseExited(MouseEvent e) {
 
@@ -345,12 +433,24 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     // # STRUCTURES
     // #---------------------------------------------------------------------------
 
+    /**
+     * The Class PanelProperties. Clase interna auxiliar para el uso de una estructura de datos de tipo HashMap.
+     */
     private class PanelProperties {
+        
         public int numeroDeCeldas;
         public int columnas;
         public List<Integer> restricciones;
         public int size;
 
+        /**
+         * Instantiates a new panel properties. Constructor de la clase. Se encarga de dar valores iniciales a los atributos.
+         *
+         * @param numeroDeCeldas the numero de celdas
+         * @param columnas the columnas
+         * @param restricciones the restricciones
+         * @param size the size
+         */
         PanelProperties(int numeroDeCeldas, int columnas, List<Integer> restricciones, int size) {
             this.numeroDeCeldas = numeroDeCeldas;
             this.columnas = columnas;

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class ControlEntrenamientoDeMemoria. Maneja la lógica del juego
+ * The Class ControlEntrenamientoDeMemoria. Maneja la logica del juego
  * entrenamiento de memoria, revuelve las cartas de manera aleatoria, determina
  * si se gana o pierde una ronda, etc.
  */
@@ -23,8 +23,9 @@ public class ControlEntrenamientoDeMemoria {
 	private int cartaGanadora;
 	private ArrayList<Integer> seleccionadas;
 
+	
 	/**
-	 * Crear nueva instancia de ControlEntrenamientoDeMemoria. Se encarga de dar
+	 * Instantiates a new control entrenamiento de memoria.  Se encarga de dar
 	 * valores iniciales a los atributos del objeto.
 	 */
 	public ControlEntrenamientoDeMemoria() {
@@ -33,8 +34,7 @@ public class ControlEntrenamientoDeMemoria {
 	}
 
 	/**
-	 * Revuelve las cartas de manera aleatoria y retorna un ArrayList con las cartas
-	 * seleccionadas.
+	 * Revuelve las cartas de manera aleatoria, determina la cartaGanadora y retorna un ArrayList con las cartas seleccionadas.
 	 *
 	 * @return the array list
 	 */
@@ -60,7 +60,7 @@ public class ControlEntrenamientoDeMemoria {
 	}
 
 	/**
-	 * Retorna el valor entero del tiempo de espera (en milisegundos).
+	 * Retorna el valor (int) del tiempo de espera (en milisegundos).
 	 *
 	 * @return the tiempo de espera
 	 */
@@ -69,8 +69,8 @@ public class ControlEntrenamientoDeMemoria {
 	}
 
 	/**
-	 * Retorna true si la carta ingresada es la ganadora y aumenta la compledidad en
-	 * 2, retorna false en caso contrario.
+	 * Retorna true si la carta ingresada es la ganadora, aumenta la complejidad en
+	 * 2 y disminuye el tiempo de espera, retorna false en caso contrario.
 	 *
 	 * @param carta the carta
 	 * @return true, if successful
