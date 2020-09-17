@@ -29,12 +29,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Arrays;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -434,7 +432,7 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     // #---------------------------------------------------------------------------
 
     /**
-     * The Class PanelProperties. Clase interna auxiliar para el uso de una estructura de datos de tipo HashMap.
+     * Structure PanelProperties. Estructura que define las propiedades de un panel de cartas
      */
     private class PanelProperties {
         
