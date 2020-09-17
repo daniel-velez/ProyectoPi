@@ -59,7 +59,6 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
     private Map<Integer, PanelProperties> panelPropertiesByCartasSize;
     private boolean siguienteRonda;
     private List<Color> bgcolorZonaJuego;
-    
     private InputStream loadFont;
     private Font niagaraphobia;
     private final int TIEMPO_DE_ESPERA = 5;
@@ -436,9 +435,16 @@ public class VistaEntrenamientoDeMemoria extends JFrame {
      */
     private class PanelProperties {
         
+        /** The numero de celdas. */
         public int numeroDeCeldas;
+        
+        /** The columnas. */
         public int columnas;
+        
+        /** The restricciones. */
         public List<Integer> restricciones;
+        
+        /** The size. */
         public int size;
 
         /**
