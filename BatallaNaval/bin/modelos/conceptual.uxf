@@ -1,0 +1,66 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>MapaBatallaNaval
+-
+</help_text><element><id>UMLClass</id><coordinates><x>330</x><y>30</y><w>310</w><h>220</h></coordinates><panel_attributes>BatallaNavalGame
+-
+tamañoMapa
+mapaJugador
+mapaAI
+barcosDeA
+barcosDeB
+-
+BatallaNavalGame() : void
+ubicarBarco(mapa, posicion, orientacion, barco) : bool
+inicializarBarcosAI() : void
+play() : void
+disparar(subject, row, col) : estado de esa casilla
+disparar(subject) : estado de esa casilla
+determinarJuego() : bool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>280</x><y>400</y><w>140</w><h>70</h></coordinates><panel_attributes>PrincipalBatallaNaval
+--
+--
+main(String[] args) : void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>580</x><y>280</y><w>280</w><h>160</h></coordinates><panel_attributes>Barco
+-
+tipo
+partesDelBarco : lista pair
+--
+Barco(tipo, posicion, orientacion)
+nosDisparan(posicion) : estado
+
+static ubicarBarco(tipo, posicion, orientacion)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>470</x><y>290</y><w>80</w><h>90</h></coordinates><panel_attributes>TipoBarco
+-
+Portaavion
+Submarino
+Destructor
+Fragata</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>20</y><w>230</w><h>320</h></coordinates><panel_attributes>BatallaNavalVista
+--
+batallaNaval : BatallaNavalGame 
+mapaJugador
+mapaAI
+panelEstado : JPanel 
+instrucciones : JTextPane
+rotar : JButton
+confirmar : JButton
+botonFragata : JButton
+botonDestructor : JButton
+botonSubmarino : JButton
+botonPortaviones : JButton
+listener : Escucha
+--
+BatallaNavalVista() : void
+initGUI() : void 
+determinarJuego() : boolean
+iniciarJuego() : void
+siguienteTurno() : void
+dispararAI() : void
+play() : void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>60</x><y>370</y><w>220</w><h>210</h></coordinates><panel_attributes>MapaBatallaNaval
+--
+casillas : JButton[]
+listener : Escucha
+mapSize : int
+--
+MapaBatallaNaval() : void
+initGUI() : void
+mostrarBarco() : void
+casillasClicked : void
+rotarBarco : void 
+confirmarBarco : void 
+validarUbicacion : boolean</panel_attributes><additional_attributes></additional_attributes></element></diagram>
