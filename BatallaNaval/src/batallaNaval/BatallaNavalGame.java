@@ -166,13 +166,13 @@ public class BatallaNavalGame {
         mapa.replace(Jugador.AI, new HashMap<>());
         this.started = false;
 
-        navySize.replace(TipoBarco.Portavion, 0);
-        navySize.replace(TipoBarco.Submarino, 0);
+        navySize.replace(TipoBarco.Portavion, 4);
+        navySize.replace(TipoBarco.Submarino, 3);
         navySize.replace(TipoBarco.Destructor, 2);
         navySize.replace(TipoBarco.Fragata, 1);
 
-        numeroDeBarcos.replace(Jugador.human, 3);
-        numeroDeBarcos.replace(Jugador.AI, 3);
+        numeroDeBarcos.replace(Jugador.human, 9);
+        numeroDeBarcos.replace(Jugador.AI, 9);
 
         inicializarBarcosAI();
     }

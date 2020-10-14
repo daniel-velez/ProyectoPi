@@ -53,6 +53,7 @@ public class MapaBatallaNaval extends JPanel {
     private Escucha listener;
     private JButton[][] casillas;
     private JLabel coordenada;
+    private List<JLabel> coordenadas;
     private TipoBarco tipo;
     private List<Orientation> orientacionesValidas;
     private Point casilla;
@@ -129,6 +130,7 @@ public class MapaBatallaNaval extends JPanel {
             this.casillaSize = 50;
             this.casillaMinSize = 31;
             this.lockCells = false;
+            this.coordenadas = new ArrayList<JLabel>();
 
             Parikesit = Font.createFont(Font.TRUETYPE_FONT,
                     getClass().getResourceAsStream("/fonts/Parikesit-0ZYR.ttf"));
@@ -178,6 +180,8 @@ public class MapaBatallaNaval extends JPanel {
             coordenada.setPreferredSize(new Dimension(casillaSize, casillaSize));
             coordenada.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
             coordenada.setFont(Parikesit.deriveFont(18f));
+            coordenada.setForeground(Color.WHITE);
+            coordenadas.add(coordenada);
             add(coordenada);
         }
 
@@ -190,6 +194,8 @@ public class MapaBatallaNaval extends JPanel {
                     coordenada.setPreferredSize(new Dimension(casillaSize, casillaSize));
                     coordenada.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
                     coordenada.setFont(Russo.deriveFont(16f));
+                    coordenada.setForeground(Color.WHITE);
+                    coordenadas.add(coordenada);
                     add(coordenada);
                 }
                 // agregar los botones al mapa
@@ -423,10 +429,16 @@ public class MapaBatallaNaval extends JPanel {
      * @param flag 
      */
     public void reducirMapa(boolean flag) {
-        if (flag)
-            setPreferredSize(new Dimension(341, 341));
-        else
+        if (flag) {
+        	setPreferredSize(new Dimension(341, 341));
+        	for(JLabel coordenada: coordenadas) 
+        		coordenada.setFont(Russo.deriveFont(12f));
+        }
+        else {
             setPreferredSize(new Dimension(550, 550));
+            for(JLabel coordenada: coordenadas) 
+        		coordenada.setFont(Russo.deriveFont(18f));
+        }
     }
 
     /**
