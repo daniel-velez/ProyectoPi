@@ -1,7 +1,7 @@
 /*
- * Programación Interactiva
- * Autor: Julián Andrés Orejuela Erazo - 1541304 
- * Autor: Daniel Felipe Vélez Cuaical - 1924306
+ * Programacion Interactiva
+ * Autor: Julian Andres Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 2: Juego de batalla naval.
  */
 package batallaNaval;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.awt.Point;
 
 /**
- * The class Barco
+ * Clase que modela un barco.
  */
 public class Barco {
     private Map<Point, EstadoCasilla> partesDelBarco;
@@ -22,9 +22,9 @@ public class Barco {
     private Orientation orientacion;
 
     /**
-     * 
-     * @param tipo
-     * @param location
+     * Instantiates a new barco.
+     * @param tipo tipo de barco
+     * @param location punto de inicio del barco
      * @param orientacion
      */
     public Barco(TipoBarco tipo, Point location, Orientation orientacion) {
@@ -40,11 +40,11 @@ public class Barco {
     }
 
     /**
-     * 
-     * @param tipo
-     * @param location
+     * Calcula los puntos que ocuparia un barco con los parametros de entrada
+     * @param tipo tipo de barco
+     * @param location punto de inicio del barco
      * @param orientacion
-     * @return
+     * @return lista de puntos
      */
     public static List<Point> ubicarBarco(TipoBarco tipo, Point location, Orientation orientacion) {
         List<Point> casillasBarco = new ArrayList<Point>();
@@ -71,8 +71,7 @@ public class Barco {
     }
 
     /**
-     * 
-     * @return
+     * Determina si el barco esta hundido o no
      */
     public boolean nosHudieron() {
         for (EstadoCasilla estado : partesDelBarco.values())
@@ -82,9 +81,9 @@ public class Barco {
     }
 
     /**
-     * 
-     * @param location
-     * @return
+     * Ejecuta la accion de disparar sobre el barco
+     * @param location la coordenada del disparo
+     * @return un mapa de las partes del barco y su estado
      */
     public Map<Point, EstadoCasilla> nosDisparan(Point location) {
         partesDelBarco.replace(location, EstadoCasilla.Tocado);
@@ -97,26 +96,34 @@ public class Barco {
     }
 
     /**
-     * 
-     * @return
+     * Gets the tipo.
+     * @return the tipo
      */
     public TipoBarco getTipo() {
         return tipo;
     }
 
     /**
-     * 
-     * @return
+     * Gets the orientacion.
+     * @return the orientacion
      */
     public Orientation getOrientacion() {
         return orientacion;
     }
 
     /**
-     * 
-     * @return
+     * Gets the points.
+     * @return the points
      */
     public List<Point> getPoints() {
         return ubicarBarco(tipo, location, orientacion);
+    }
+
+    /**
+     * Gets the partes del barco
+     * @return the partes del barco
+     */
+    public Map<Point, EstadoCasilla> getPartesDelBarco() {
+        return partesDelBarco;
     }
 }

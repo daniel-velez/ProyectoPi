@@ -1,7 +1,7 @@
 /*
- * Programación Interactiva
- * Autor: Julián Andrés Orejuela Erazo - 1541304 
- * Autor: Daniel Felipe Vélez Cuaical - 1924306
+ * Programacion Interactiva
+ * Autor: Julian Andres Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 2: Juego de batalla naval.
  */
 package batallaNaval;
@@ -18,12 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-
-import batallaNaval.BatallaNavalGame.Jugador;
-
 import java.awt.Font;
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -45,30 +40,29 @@ import java.awt.geom.AffineTransform;
 
 import javax.swing.JOptionPane;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-//!IMPORTANTE: x es columa, y es fila
-
+/**
+ * Clase que representa y controla el mapa donde se ubican los barcos de cada jugador.
+ */
 public class MapaBatallaNaval extends JPanel {
+
     // # Relacion conoce un game y una vista
+    private final int ASCII_CHAR_A = 65;
     private BatallaNavalGame batallaNaval;
     private BatallaNavalVista vista;
-
     private Escucha listener;
     private JButton[][] casillas;
     private JLabel coordenada;
-    private int mapSize;
-    private final int ASCII_CHAR_A = 65;
-
     private TipoBarco tipo;
-    // private List<Point> puntos;
     private List<Orientation> orientacionesValidas;
     private Point casilla;
+
+    private int mapSize;
     private int orientacion;
     private int casillaSize;
     private int casillaMinSize;
     private boolean lockCells;
+
     private Font Parikesit;
     private Font Russo;
 
@@ -87,8 +81,12 @@ public class MapaBatallaNaval extends JPanel {
     private Map<TipoBarco, BufferedImage> imagenBarcos = new HashMap<>();
     private Map<TipoBarco, BufferedImage> imagenBarcosMin = new HashMap<>();
 
-    // private Map<TipoBarco, Integer> cantidadBarcos;
-
+    /**
+     * Instantiates a new mapa batalla naval.
+     *
+     * @param batallaNaval el objeto control de tipo BatallaNavalGame
+     * @param vista el objeto vista de tipo BatallaNavalVista
+     */
     public MapaBatallaNaval(BatallaNavalGame batallaNaval, BatallaNavalVista vista) {
 
         try {
@@ -101,7 +99,7 @@ public class MapaBatallaNaval extends JPanel {
             dark = ImageIO.read(getClass().getResource("/images/dark.png"));
             ximg = ImageIO.read(getClass().getResource("/images/x.png"));
 
-            // carga de imagenes pequeñas
+            // carga de imagenes reducidas
             portavionesMin = ImageIO.read(getClass().getResource("/images/portavion-min.png"));
             destructorMin = ImageIO.read(getClass().getResource("/images/destructor-min.png"));
             fragataMin = ImageIO.read(getClass().getResource("/images/fragata-min.png"));
@@ -137,6 +135,7 @@ public class MapaBatallaNaval extends JPanel {
             Russo = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/RussoOne-Regular.ttf"));
 
             initGUI();
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             // e.printStackTrace();
@@ -144,6 +143,11 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Muestra el marco de la esquina superior izquierda y el fondo del mapa
+     *
+     * @param g 
+     */
     @Override
     public void paint(Graphics g) {
         g.drawImage(new ImageIcon(getClass().getResource("/images/textura_agua.png")).getImage(), 0, 0, getWidth(),
@@ -155,6 +159,9 @@ public class MapaBatallaNaval extends JPanel {
         super.paint(g);
     }
 
+    /**
+     * Inits the GUI.
+     */
     private void initGUI() {
         this.setLayout(new GridLayout(mapSize + 1, mapSize + 1));
 
@@ -192,8 +199,6 @@ public class MapaBatallaNaval extends JPanel {
                 casillas[fila][columna].setCursor(new Cursor(Cursor.HAND_CURSOR));
                 casillas[fila][columna].addActionListener(listener);
                 casillas[fila][columna].addMouseListener(listener);
-                //casillas[fila][columna].setOpaque(false);
-                //casillas[fila][columna].setBorder(BorderFactory.createLineBorder(new Color(11, 75, 125), 1));
                 casillas[fila][columna].setContentAreaFilled(false);
 
                 add(casillas[fila][columna]);
@@ -201,7 +206,13 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Controla lo que ocurre al hacer click en una casilla del mapa.
+     * @param fila 
+     * @param columna 
+     */
     private void casillaClicked(int fila, int columna) {
+
         if (orientacionesValidas.size() > 0)
             descartarBarco(false);
 
@@ -218,14 +229,11 @@ public class MapaBatallaNaval extends JPanel {
                 mostrarBarco(Barco.ubicarBarco(tipo, casilla, orientacionesValidas.get(0)), Color.GRAY);
                 asignarImagenes(Barco.ubicarBarco(tipo, casilla, orientacionesValidas.get(0)), imagenBarcos);
             } else {
-                // ! pendiente revisar este caso
-                // mensaje
+                // no se puede ubicar el barco en esas casillas
             }
 
         } else if (!batallaNaval.haEmpezado() && tipo == null) {
-            // ! pendiente revisar este caso
-            // # se intenta ubicar un barco pero no se ha seleccionado un tipo
-            // mostrar msj
+            // se intenta ubicar un barco pero no se ha seleccionado un tipo
         } else {
             // # el juego ya ha empezado
             if (casillas[fila][columna].getBackground() == Color.BLUE) {
@@ -236,21 +244,42 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Remueve cualquier icono que tengan las casillas de los barcos
+     * @param puntos lista de puntos para quitarles el icono
+     */
     public void ocultarBarcos(List<Point> puntos) {
         for (Point punto : puntos)
             casillas[(int) punto.getY()][(int) punto.getX()].setIcon(null);
     }
 
+    /**
+     * Muestra las imagenes de los barcos del conjunto especificado
+     * @param barcos conjunto de barcos
+     */
     public void mostrarBarco(Set<Barco> barcos) {
         for (Barco barco : barcos) {
             asignarImagenes(barco.getTipo(), barco.getOrientacion(), barco.getPoints(), imagenBarcos, casillaSize);
         }
     }
 
+    /**
+     * Asigna las imagenes correspondientes a la lista de puntos especificada
+     * @param puntos lista de puntos del barco
+     * @param mapa mapa que contiene la imagen de los barcos
+     */
     public void asignarImagenes(List<Point> puntos, Map<TipoBarco, BufferedImage> mapa) {
         asignarImagenes(tipo, orientacionesValidas.get(orientacion), puntos, mapa, casillaSize);
     }
 
+    /**
+     * Asigna las imagenes correspondientes a la lista de puntos teninedo en cuenta los otros parametros ingresados.
+     * @param tipo el tipo de barco
+     * @param orientacion la orientacion del barco
+     * @param puntos lista de puntos del barco
+     * @param mapa mapa que contiene la imagen de los barcos
+     * @param casilla dimension de la casilla 
+     */
     public void asignarImagenes(TipoBarco tipo, Orientation orientacion, List<Point> puntos,
             Map<TipoBarco, BufferedImage> mapa, int casilla) {
 
@@ -278,6 +307,12 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Muestra el resultado del disparo a una casilla del mapa
+     * @param resultado mapa con las ubicaciones y el estado de las casillas
+     * @param disparoAJugador determina si se le esta o no disparando
+    al jugador (human)
+     */
     public void dibujarDisparo(Map<Point, EstadoCasilla> resultado, boolean disparoAJugador) {
 
         Map<EstadoCasilla, Color> colorEstadoCasilla = new HashMap<>();
@@ -285,6 +320,20 @@ public class MapaBatallaNaval extends JPanel {
         colorEstadoCasilla.put(EstadoCasilla.Tocado, new Color(235, 222, 24));
         colorEstadoCasilla.put(EstadoCasilla.Hundido, new Color(235, 130, 24));
         colorEstadoCasilla.put(EstadoCasilla.aFlote, Color.BLACK);
+
+        Barco elBarco;
+        Point primerPunto = (Point) new ArrayList(resultado.keySet()).get(0);
+        if (resultado.get(primerPunto) == EstadoCasilla.Hundido) {
+            if (disparoAJugador) {
+                elBarco = batallaNaval.getMap(BatallaNavalGame.Jugador.human).get(primerPunto);
+                asignarImagenes(elBarco.getTipo(), elBarco.getOrientacion(), elBarco.getPoints(), imagenBarcosMin,
+                        casillaMinSize);
+            } else {
+                elBarco = batallaNaval.getMap(BatallaNavalGame.Jugador.AI).get(primerPunto);
+                asignarImagenes(elBarco.getTipo(), elBarco.getOrientacion(), elBarco.getPoints(), imagenBarcos,
+                        casillaSize);
+            }
+        }
 
         for (Point punto : resultado.keySet())
             if (resultado.get(punto) != EstadoCasilla.aFlote) {
@@ -305,12 +354,12 @@ public class MapaBatallaNaval extends JPanel {
 
                 if (casillaIcon != null)
                     g.drawImage(iconToImage(casillaIcon), 0, 0, null);
-                // casillas[(int) punto.getY()][(int) punto.getX()].getIcon().paintIcon(null, g,
-                // 0, 0);
                 if (resultado.get(punto) == EstadoCasilla.Tocado)
                     g.drawImage(fuego, 0, 0, null);
-                if (resultado.get(punto) == EstadoCasilla.Hundido)
+                if (resultado.get(punto) == EstadoCasilla.Hundido) {
+                    g.drawImage(fuego, 0, 0, null);
                     g.drawImage(fuegoOscuro, 0, 0, null);
+                }
                 if (resultado.get(punto) == EstadoCasilla.Disparo)
                     g.drawImage(imagenX, 0, 0, null);
 
@@ -319,6 +368,11 @@ public class MapaBatallaNaval extends JPanel {
             }
     }
 
+    /**
+     * Transform an Icon to an image
+     * @param icon 
+     * @return the image
+     */
     private Image iconToImage(Icon icon) {
         if (icon instanceof ImageIcon) {
             return ((ImageIcon) icon).getImage();
@@ -336,6 +390,10 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Activa o desactiva los botones del mapa
+     * @param b activar o desactivar
+     */
     public void activarBotones(boolean b) {
         lockCells = !b;
 
@@ -351,12 +409,19 @@ public class MapaBatallaNaval extends JPanel {
 
     }
 
+    /**
+     * Deja sin el efecto de hover a los JButtons del mapa
+     */
     public void quitarEfecto() {
         for (int fila = 0; fila < mapSize; fila++)
             for (int columna = 0; columna < mapSize; columna++)
                 casillas[fila][columna].setBorder(BorderFactory.createLineBorder(new Color(122, 138, 153), 1));
     }
 
+    /**
+     * Modifica la dimension del mapa de acuerdo al parametro ingresado
+     * @param flag 
+     */
     public void reducirMapa(boolean flag) {
         if (flag)
             setPreferredSize(new Dimension(341, 341));
@@ -364,6 +429,9 @@ public class MapaBatallaNaval extends JPanel {
             setPreferredSize(new Dimension(550, 550));
     }
 
+    /**
+     * Reinicia las variables de MapaBatallaNaval
+     */
     public void reiniciar() {
         this.tipo = batallaNaval.cambiarTipoBarco();
         this.casilla = null;
@@ -383,38 +451,44 @@ public class MapaBatallaNaval extends JPanel {
         this.repaint();
     }
 
+    /**
+     * Asigna las imagenes reducidas correspondientes a los barcos del mapa del jugador (human)
+     */
     public void setImagenesMin() {
-
         Set<Barco> barcos = new HashSet<Barco>(batallaNaval.getMap(BatallaNavalGame.Jugador.human).values());
 
         for (Barco barco : barcos) {
             asignarImagenes(barco.getTipo(), barco.getOrientacion(), barco.getPoints(), imagenBarcosMin,
                     casillaMinSize);
         }
-        /*
-         * for (int fila = 0; fila < mapSize; fila++) { for (int columna = 0; columna <
-         * mapSize; columna++) { Point punto = new Point(fila, columna);
-         * 
-         * if (barcos.get(punto) != null) { asignarImagenes(barcos.get(punto).getTipo(),
-         * barcos.get(punto).getOrientacion(), barcos.get(punto).getPoints(),
-         * imagenBarcosMin, casillaMinSize); } } }
-         */
     }
 
     // #---------------------------------------------------------------------------
     // # METODOS PARA UBICAR LOS BARCOS
     // #---------------------------------------------------------------------------
 
+    /**
+     * Muestra en el mapa un barco ubicado en las casillas de puntos con el color dado
+     * @param puntos
+     * @param unColor
+     */
     public void mostrarBarco(List<Point> puntos, Color unColor) {
         for (Point punto : puntos)
             casillas[(int) punto.getY()][(int) punto.getX()].setBackground(unColor);
     }
 
+    /**
+     * Cambia el tipo de barco seleccionado y descarta cualquier proceso de ubicacion anterior
+     * @param tipo tipo de barco
+     */
     public void setBarcoSeleccionado(TipoBarco tipo) {
         descartarBarco();
         this.tipo = tipo;
     }
 
+    /**
+     * Rota el barco que esta en proceso de ubicacion en el sentido de las manecillas del reloj
+     */
     public void rotarBarco() {
         if (tipo != null && casilla != null) {
             // # proceso de rotacion del barco
@@ -431,16 +505,18 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
-    // ! revisar
+    /**
+     * Fija un barco en el mapa del jugador (human)
+     */
     // ! el misterio del tipo = null cuando doble click sobre un barco puesto
     public void confirmarBarco() {
-        if (!(orientacionesValidas.size() > 0)) // si no hay un proceso de ubicar barco, no se puede confirmar nada
+        if (!(orientacionesValidas.size() > 0)) // si no hay un proceso de ubicar barco, no se puede fijar nada
             return;
         if (tipo != null && casilla != null) {
             for (Point punto : Barco.ubicarBarco(tipo, casilla, orientacionesValidas.get(orientacion)))
                 casillas[(int) punto.getY()][(int) punto.getX()].setBackground(Color.BLACK);
 
-            // se ubca el barco en el mapa del jugador (human)
+            // se ubica el barco en el mapa
             batallaNaval.ubicarBarco(BatallaNavalGame.Jugador.human, casilla, orientacionesValidas.get(orientacion),
                     tipo);
 
@@ -456,21 +532,28 @@ public class MapaBatallaNaval extends JPanel {
         }
     }
 
+    /**
+     * Verifica que los puntos esten libres en el mapa
+     * @param puntos
+     * @return true si es valida
+     */
     private boolean validarUbicacion(List<Point> puntos) {
-
-        // verificar que la posicion no este ya ocupada por otro barco
         for (Point punto : puntos) {
             // el barco no se salga del mapa
             if (!(punto.getX() < mapSize && punto.getX() >= 0 && punto.getY() < mapSize && punto.getY() >= 0))
                 return false;
 
+            // verificar que la posicion no este ya ocupada por otro barco
             if (!(casillas[(int) punto.getY()][(int) punto.getX()].getBackground() == Color.BLUE))
                 return false;
         }
-
         return true;
     }
 
+    /**
+     * Descarta el proceso de ubicacion de un barco
+     * @param totalClean determina si se hace una limpieza total de las variables o solo parcial
+     */
     private void descartarBarco(boolean totalClean) {
         // si hay actualmente un barco en proceso de ubicacion
         if (orientacionesValidas.size() > 0) {
@@ -479,14 +562,20 @@ public class MapaBatallaNaval extends JPanel {
             }
             mostrarBarco(Barco.ubicarBarco(tipo, casilla, orientacionesValidas.get(orientacion)), Color.BLUE);
             resetProcesoUbicacion(totalClean);
-
         }
     }
 
+    /**
+     * Descarta el proceso de ubicacion de un barco, haciendo una limpieza total de las variables
+     */
     private void descartarBarco() {
         descartarBarco(true);
     }
 
+    /**
+     * Resetea el proceso de ubicacion
+     * @param totalClean determina si se hace una limpieza total de las variables o solo parcial
+     */
     private void resetProcesoUbicacion(boolean totalClean) {
         orientacion = 0;
         orientacionesValidas.clear();
@@ -495,8 +584,13 @@ public class MapaBatallaNaval extends JPanel {
             tipo = null;
     }
 
+    /**
+     * rotar una imagen de acuerdo a los parametros
+     * @param img
+     * @param angle angulo de rotacion, en grados
+     * @return the buffered image
+     */
     public BufferedImage rotarImagen(BufferedImage img, double angle) {
-
         double rads = Math.toRadians(angle);
         double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
         int w = img.getWidth();
@@ -525,7 +619,16 @@ public class MapaBatallaNaval extends JPanel {
     // # LISTENER
     // #---------------------------------------------------------------------------
 
+    /**
+     * The Class Escucha.
+     */
     private class Escucha extends MouseAdapter implements ActionListener {
+
+        /**
+         * Action performed.
+         *
+         * @param event the event
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             if (!lockCells)
@@ -538,6 +641,11 @@ public class MapaBatallaNaval extends JPanel {
 
         }
 
+        /**
+         * Mouse clicked.
+         *
+         * @param evnt the evnt
+         */
         @Override
         public void mouseClicked(MouseEvent evnt) {
             if (!lockCells)

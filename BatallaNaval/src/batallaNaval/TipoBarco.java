@@ -1,7 +1,7 @@
 /*
- * Programación Interactiva
- * Autor: Julián Andrés Orejuela Erazo - 1541304 
- * Autor: Daniel Felipe Vélez Cuaical - 1924306
+ * Programacion Interactiva
+ * Autor: Julian Andres Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 2: Juego de batalla naval.
  */
 package batallaNaval;
@@ -10,7 +10,6 @@ package batallaNaval;
  * Enum TipoBarco: enum utilizado para obtener cada tipo de barco y su correspondiente tamaño.
  */
 public enum TipoBarco {
-    //Portavion(4), Submarino(3), Destructor(2), Fragata(1);
     Portavion(3), Submarino(2), Destructor(4), Fragata(1);
 
     public final int size;
