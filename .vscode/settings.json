@@ -1,0 +1,20 @@
+{
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true,
+        "**/.vscode": true,
+        "**/bin": true,
+        "**/doc": true,
+        "**/.metadata": true,
+        "**/.gitignore": true,
+        "**/EntrenamientoDeMemoria/capturas de muestra": true,
+        "**/EntrenamientoDeMemoria/src/images": true,
+        "**/EntrenamientoDeMemoria/src/fonts": true,
+        "**/EntrenamientoDeMemoria/src/modelos": true,
+        "**/BatallaNaval/src/images": true,
+        "**/BatallaNaval/src/fonts": true,
+        "**/BatallaNaval/src/modelos": true,
+    }
+}
