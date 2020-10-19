@@ -1,15 +1,24 @@
+/*
+ * Programacion Interactiva
+ * Autor: Julian Andres Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Velez Cuaical - 1924306
+ * Mini proyecto 3: Juego de poker clasico.
+ */
 package classicPoker;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Clase que modela el juego de poker clasico.
  */
 public class PokerGame implements Runnable {
-    private int[] mesaDeApuesta;
+    private Map<Jugador, Integer> mesaDeApuesta;
     private MazoDeCartas mazo;
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
@@ -21,7 +30,7 @@ public class PokerGame implements Runnable {
      * Instantiates a new poker game.
      */
     public PokerGame() {
-        this.mesaDeApuesta = new int[] { 0, 0, 0, 0, 0 };
+        this.mesaDeApuesta = new HashMap<>();
         this.mazo = new MazoDeCartas();
         this.turno = 0;
         this.apuestaInicial = 1000;
@@ -46,13 +55,15 @@ public class PokerGame implements Runnable {
         // hacer la apuesta inicial
         for (Jugador jugador : jugadores) {
             jugador.aportar(apuestaInicial);
-            mesaDeApuesta[0] = apuestaInicial; //! falta conectar mesa de apuesta con cada jugador
+            mesaDeApuesta.put(jugador, apuestaInicial);
+            // mesaDeApuesta[0] = apuestaInicial; //! falta conectar mesa de apuesta con
+            // cada jugador
         }
 
         repartirCartas();
 
-        //selecciona el jugador “mano”
-        Collections.shuffle(jugadores); //! no se tiene en cuenta lo del jugador a la derecha
+        // selecciona el jugador “mano”
+        Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
 
         rondaDeApuesta();
     }
@@ -66,11 +77,10 @@ public class PokerGame implements Runnable {
         int numeroRonda = 1;
 
         while (seHanIgualadoTodasLasApuestas()) {
-
             numeroRonda += 1;
         }
 
-        rondaDeDescarte(); //! una manera de escoger entre descarte o descubrir cartas
+        rondaDeDescarte(); // ! una manera de escoger entre descarte o descubrir cartas
         descubrirCartas();
     }
 
@@ -91,9 +101,17 @@ public class PokerGame implements Runnable {
     // #---------------------------------------------------------------------------
 
     private boolean seHanIgualadoTodasLasApuestas() {
+
+        /*
         for (int i = 1; i < mesaDeApuesta.length; i++)
             if (mesaDeApuesta[i] != mesaDeApuesta[0])
                 return false;
+        */
+        List<Jugador> listaJugadores = (List<Jugador>) mesaDeApuesta.keySet();
+        for (int i = 1; i < listaJugadores.size(); i++ ) {
+            if (mesaDeApuesta.get(listaJugadores.get(i)) != mesaDeApuesta.get(listaJugadores.get(0)))
+                return false;
+        }
         return true;
     }
 

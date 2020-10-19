@@ -7,11 +7,7 @@
 package classicPoker;
 
 public class Carta {
-
-    public enum Palos {
-        picas, corazones, diamantes, treboles
-    }
-
+    
     public final int numero;
     public final Palos palo;
     
@@ -21,3 +17,6 @@ public class Carta {
     }
 }
 
+enum Palos {
+    picas, corazones, diamantes, treboles
+}

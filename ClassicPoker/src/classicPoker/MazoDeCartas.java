@@ -32,7 +32,7 @@ public class MazoDeCartas {
      */
     public void crearBaraja() {
 
-        for (Carta.Palos palo : Carta.Palos.values()) {
+        for (Palos palo : Palos.values()) {
              //crear las cartas de cada palo
             for (int i = 0; i < 12; i++) {
                 cartas.add(new Carta(i+2, palo));
