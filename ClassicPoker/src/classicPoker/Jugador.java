@@ -30,6 +30,7 @@ public class Jugador {
         this.tipo = tipo;
         this.seHaRetirado = false;
         this.mano = new ArrayList<Carta>();
+        this.nombre = "Test";
     }
 
     /**

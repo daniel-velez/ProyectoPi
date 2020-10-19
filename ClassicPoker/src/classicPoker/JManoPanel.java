@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class JManoPanel extends JPanel {
+    
     private Map<JButton, Carta> JMano;
     private Jugador jugador;
     private JLabel nombre, dinero;

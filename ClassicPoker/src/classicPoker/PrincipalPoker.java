@@ -14,7 +14,7 @@ import java.util.List;
  * Clase que contiene el metodo main
  * e inicia el programa.
  */
-public class PrincipalClassicPoker {
+public class PrincipalPoker {
 	/**
 	 * The main method.
 	 *
@@ -22,22 +22,13 @@ public class PrincipalClassicPoker {
 	 */
 	public static void main(String[] args) {
 
-        /*
+        
         EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				//PokerView myGame = new PokerView();
+				//PokerView myGame = new PokerView(jugadores);
 			}
         });
-        */
-        List <Carta> cartas = new ArrayList<Carta>();
-        cartas.add(new Carta(10, Palos.corazones));
-        cartas.add(new Carta(11, Palos.corazones));
-        cartas.add(new Carta(12, Palos.corazones));
-        cartas.add(new Carta(13, Palos.corazones));
-        cartas.add(new Carta(14, Palos.corazones));
-
-        int manoPoker = PokerRules.determinarMano(cartas);
-        System.out.println("La mano es: " + manoPoker);
+        
 	}
 }
