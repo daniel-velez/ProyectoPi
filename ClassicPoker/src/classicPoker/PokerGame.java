@@ -4,6 +4,7 @@
  * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 3: Juego de poker clasico.
  */
+
 package classicPoker;
 
 import java.util.ArrayList;
@@ -108,7 +109,7 @@ public class PokerGame implements Runnable {
                 return false;
         */
         List<Jugador> listaJugadores = (List<Jugador>) mesaDeApuesta.keySet();
-        for (int i = 1; i < listaJugadores.size(); i++ ) {
+        for (int i = 1; i < listaJugadores.size(); i++) {
             if (mesaDeApuesta.get(listaJugadores.get(i)) != mesaDeApuesta.get(listaJugadores.get(0)))
                 return false;
         }

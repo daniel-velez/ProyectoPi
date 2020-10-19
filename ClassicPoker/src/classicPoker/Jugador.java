@@ -13,7 +13,7 @@ import java.util.List;
  * Clase que modela un jugador.
  */
 public class Jugador {
-    
+
     private int dinero;
     private String nombre;
     private List<Carta> mano;
@@ -54,7 +54,7 @@ public class Jugador {
      * @return valor de la apuesta o null en caso de pasar, retirarse
      */
     public int apostar(int carrier) {
-       
+        return 0;
     }
 
     /**
@@ -62,7 +62,7 @@ public class Jugador {
      * @return lista de cartas a descartar
      */
     public List<Carta> descartar() {
-        
+        return new ArrayList<Carta>();
     }
 
     /**
@@ -96,6 +96,13 @@ public class Jugador {
      */
     public TipoJugador getTipo() {
         return tipo;
+    }
+
+    /**
+     * @return la mano del jugador.
+     */
+    public List<Carta> getMano() {
+        return mano;
     }
 }
 
