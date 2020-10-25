@@ -10,11 +10,14 @@ package classicPoker;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,17 +27,18 @@ import java.awt.event.ActionListener;
  */
 public class PokerView extends JFrame {
 
-    JInstruccionesPanel instrucciones;
-    List <Jugador> jugadores;
-    List <JManoPanel> playersView;
-    JLabel userMoney, userName;
-    JLabel textBig, textSmall;
+    private JInstruccionesPanel instrucciones;
+    private List <Jugador> jugadores;
+    private Jugador usuario;
+    private List <JManoPanel> playersView;
+    private JLabel userMoney, userName;
+    private JLabel textBig, textSmall;
 
-    List <JButton> fichas;
-    JButton apostar, pasar, igualar, aumentar, descartar;
-    JButton retirarse, ayuda, levantarse, saltar;
+    private List <JButton> fichas;
+    private JButton apostar, pasar, igualar, aumentar, descartar;
+    private JButton retirarse, ayuda, levantarse, saltar;
 
-    Escucha listener;
+    private Escucha listener;
     
     /**
      * Instantiates a new poker view.
@@ -43,6 +47,11 @@ public class PokerView extends JFrame {
 
         this.jugadores = jugadores;
         this.instrucciones = new JInstruccionesPanel();
+
+        for (Jugador jugador : jugadores) {
+            if(jugador.getTipo() == TipoJugador.Usuario) 
+                usuario = jugador;
+        }
 
         initGUI();
 
@@ -59,38 +68,49 @@ public class PokerView extends JFrame {
      */
     private void initGUI() {
 
-        this.setLayout(new  GridLayout(3,3)); // olvide que tambien es necesario las columnas.
+        this.setLayout(new  GridLayout(3,9)); // olvide que si se pone 1 columna solo la ocupa 1 componente
 
         listener = new Escucha();
 
-        //# Usuario
-
-        userMoney = new JLabel();
-        userName = new JLabel();
-
-        for (Jugador jugador : jugadores) {
-            if(jugador.getTipo() == TipoJugador.Usuario) {
-                userMoney.setText(Integer.toString(jugador.getDinero()));
-                userName.setText(jugador.getName());
-            }
-        }
 
         //# Vista de los jugadores
         
         playersView = new ArrayList<JManoPanel>();
-        for (Jugador jugador : jugadores) {
-            if (jugador.getTipo() != TipoJugador.Usuario)
-                playersView.add(new JManoPanel(jugador));
-        }
+        for (Jugador jugador : jugadores) 
+            playersView.add(new JManoPanel(jugador));
 
 
+        for (int i = 0; i<3; i++)
+            add(playersView.get(i));
 
-        
         //# Indicaciones
 
         textBig = new JLabel();
         textSmall = new JLabel();
 
+        textBig.setPreferredSize(new Dimension(200, 40));
+        textBig.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        add(textBig);
+
+        textSmall.setPreferredSize(new Dimension(100, 40));
+        textSmall.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        add(textSmall);
+
+
+        add(playersView.get(3));
+
+        //# Usuario
+
+        add(playersView.get(4));
+
+        userMoney = new JLabel();
+        userName = new JLabel();
+
+        userMoney.setText(Integer.toString(usuario.getDinero()));
+        userName.setText(usuario.getName());
+
+        add(userMoney);
+        add(userName);
 
         //# Botones
 
@@ -117,20 +137,27 @@ public class PokerView extends JFrame {
         aumentar = new JButton();
         configurarBoton(aumentar, listener);
 
-        descartar = new JButton();
-        configurarBoton(descartar, listener);
-
         retirarse = new JButton();
         configurarBoton(retirarse, listener);
 
-        ayuda = new JButton();
-        configurarBoton(ayuda, listener);
+        descartar = new JButton();
+        configurarBoton(descartar, listener);
 
         levantarse = new JButton();
         configurarBoton(levantarse, listener);
 
         saltar = new JButton();
         configurarBoton(saltar, listener);
+
+        ayuda = new JButton();
+        configurarBoton(ayuda, listener);
+
+        add(apostar);
+        add(pasar);
+        add(igualar);
+        add(aumentar);
+        add(retirarse);
+        add(descartar);
 
     }
     

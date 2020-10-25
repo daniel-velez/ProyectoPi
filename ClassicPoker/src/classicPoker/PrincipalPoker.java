@@ -10,6 +10,8 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.UIManager;
+
 /**
  * Clase que contiene el metodo main
  * e inicia el programa.
@@ -22,13 +24,16 @@ public class PrincipalPoker {
 	 */
 	public static void main(String[] args) {
 
-        
-        EventQueue.invokeLater(new Runnable() {
+        try {
+			String className = UIManager.getCrossPlatformLookAndFeelClassName();
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {}
+		
+		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				//PokerView myGame = new PokerView(jugadores);
 			}
         });
-        
 	}
 }

@@ -19,6 +19,7 @@ public class Jugador {
     private List<Carta> mano;
     private TipoJugador tipo;
     private boolean seHaRetirado;
+    private PokerView vista;
 
     /**
      * Instantiates a new jugador.
@@ -72,6 +73,14 @@ public class Jugador {
      */
     public boolean estaJugando() {
         return !seHaRetirado;
+    }
+    
+    /**
+     * 
+     * @param vista
+     */
+    public void setVista(PokerView vista) {
+        this.vista = vista;
     }
 
     // #---------------------------------------------------------------------------

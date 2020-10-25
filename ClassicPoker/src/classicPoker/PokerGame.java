@@ -24,6 +24,7 @@ public class PokerGame implements Runnable {
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
     private int apuestaInicial;
+    private PokerView vista;
 
     private Random aleatorio;
 
@@ -44,6 +45,12 @@ public class PokerGame implements Runnable {
         jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
         jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
         jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Usuario));
+
+        vista = new PokerView(jugadores);
+
+        for (Jugador jugador : jugadores) {
+            jugador.setVista(vista);
+        }
     }
 
     @Override
