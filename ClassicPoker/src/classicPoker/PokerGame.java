@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import java.awt.EventQueue;
+
 /**
  * Clase que modela el juego de poker clasico.
  */
@@ -24,7 +26,7 @@ public class PokerGame implements Runnable {
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
     private int apuestaInicial;
-    private PokerView vista;
+    private PokerView pokerView;
 
     private Random aleatorio;
 
@@ -32,9 +34,8 @@ public class PokerGame implements Runnable {
      * Instantiates a new poker game.
      */
     public PokerGame() {
-        this.mesaDeApuesta = new HashMap<>();
+        this.mesaDeApuesta = new HashMap<Jugador, Integer>();
         this.mazo = new MazoDeCartas();
-        this.turno = 0;
         this.apuestaInicial = 1000;
         this.aleatorio = new Random();
 
@@ -46,27 +47,39 @@ public class PokerGame implements Runnable {
         jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
         jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Usuario));
 
-        vista = new PokerView(jugadores);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pokerView = new PokerView(jugadores);
 
-        for (Jugador jugador : jugadores) {
-            jugador.setVista(vista);
-        }
+                for (Jugador jugador : jugadores)
+                    jugador.defineView(pokerView);
+            }
+        });
     }
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
+        try {
+            while (pokerView == null)
+                Thread.sleep(100);
 
+            iniciarRonda();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void iniciarRonda() {
+    private void iniciarRonda() throws InterruptedException {
+        pokerView.iniciarRonda();
+
         // hacer la apuesta inicial
         for (Jugador jugador : jugadores) {
             jugador.aportar(apuestaInicial);
             mesaDeApuesta.put(jugador, apuestaInicial);
-            // mesaDeApuesta[0] = apuestaInicial; //! falta conectar mesa de apuesta con
-            // cada jugador
         }
+
+        pokerView.showMessage("Apuesta inicial: $" + apuestaInicial, 3000);
 
         repartirCartas();
 

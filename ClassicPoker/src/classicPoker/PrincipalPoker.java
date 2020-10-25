@@ -6,10 +6,6 @@
  */
 package classicPoker;
 
-import java.awt.EventQueue;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.UIManager;
 
 /**
@@ -24,16 +20,13 @@ public class PrincipalPoker {
 	 */
 	public static void main(String[] args) {
 
-        try {
+		try {
 			String className = UIManager.getCrossPlatformLookAndFeelClassName();
 			UIManager.setLookAndFeel(className);
-		} catch (Exception e) {}
-		
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				//PokerView myGame = new PokerView(jugadores);
-			}
-        });
+		} catch (Exception e) {
+		}
+
+		Thread pokerGame = new Thread(new PokerGame());
+		pokerGame.start();
 	}
 }

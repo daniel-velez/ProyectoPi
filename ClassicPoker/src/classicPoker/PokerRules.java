@@ -19,6 +19,12 @@ import javax.lang.model.util.ElementScanner6;
  */
 public class PokerRules {
 
+    private interface pokerRule {
+        public int f(int x);
+    }
+
+    private static pokerRule[] hh = { (x) -> 2 * x, (x) -> 5 * x };
+
     //! hay que verificar que la mano sea de 5 cartas? o lo damos por hecho
 
     /**

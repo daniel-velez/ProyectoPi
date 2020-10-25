@@ -19,7 +19,7 @@ public class Jugador {
     private List<Carta> mano;
     private TipoJugador tipo;
     private boolean seHaRetirado;
-    private PokerView vista;
+    private PokerView pokerView;
 
     /**
      * Instantiates a new jugador.
@@ -34,12 +34,17 @@ public class Jugador {
         this.nombre = "Test";
     }
 
+    public void defineView(PokerView pokerView) {
+        this.pokerView = pokerView;
+    }
+
     /**
      * Aporta la cantidad de dinero a la mesa de apuesta
      * @param cantidad la cantidad de dinero
      */
     public void aportar(int cantidad) {
         dinero -= cantidad;
+        pokerView.updateMoney(this);
     }
 
     /**
@@ -48,6 +53,7 @@ public class Jugador {
      */
     public void recibirCartas(List<Carta> cartas) {
         mano.addAll(cartas);
+        pokerView.descubrirCartas(this);
     }
 
     /**
@@ -74,14 +80,6 @@ public class Jugador {
     public boolean estaJugando() {
         return !seHaRetirado;
     }
-    
-    /**
-     * 
-     * @param vista
-     */
-    public void setVista(PokerView vista) {
-        this.vista = vista;
-    }
 
     // #---------------------------------------------------------------------------
     // # GETTERS
@@ -90,7 +88,7 @@ public class Jugador {
     /**
      * @return el dinero del jugador.
      */
-    public int getDinero() {
+    public Integer getDinero() {
         return dinero;
     }
 

@@ -14,8 +14,7 @@ import java.util.List;
  * Clase que modela un mazo de cartas.
  */
 public class MazoDeCartas {
-
-    private List<Carta> cartas; // lista o pila de cartas.
+    private List<Carta> cartas;
     private List<Carta> mazoDescarte;
 
     /**
@@ -25,19 +24,17 @@ public class MazoDeCartas {
         this.cartas = new ArrayList<Carta>();
         this.mazoDescarte = new ArrayList<Carta>();
         crearBaraja();
+        revolverMazo();
     }
 
     /**
      * Crea una baraja de cartas organizada.
      */
     public void crearBaraja() {
-
-        for (Palos palo : Palos.values()) {
-             //crear las cartas de cada palo
-            for (int i = 0; i < 12; i++) {
-                cartas.add(new Carta(i+2, palo));
-            }
-        }
+        for (Palos palo : Palos.values())
+            //crear las cartas de cada palo
+            for (int i = 2; i <= 14; i++)
+                cartas.add(new Carta(i, palo));
     }
 
     /**
@@ -51,8 +48,12 @@ public class MazoDeCartas {
      * retorna una lista de n cartas.
      * @param n
      */
+    //! qué pasa si se intentan sacar 0 cartas?
     public List<Carta> sacarCartas(int n) {
-        return cartas.subList(0, n); // pendiente revisar el funcionamiento de ese metodo.
+        List<Carta> mano = new ArrayList<Carta>();
+        mano.addAll(cartas.subList(0, n));
+        cartas.removeAll(mano);
+        return mano;
     }
 
     /**

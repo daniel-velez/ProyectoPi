@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class JManoPanel extends JPanel {
-    
+
     private Map<JButton, Carta> JMano;
     private Jugador jugador;
     private JLabel nombre, dinero;
@@ -29,8 +31,9 @@ public class JManoPanel extends JPanel {
         this.cartasSeleccionadas = new ArrayList<JButton>();
 
         JMano = new HashMap<JButton, Carta>();
-        for (Carta carta : jugador.getMano())
-            JMano.put(new JButton(Integer.toString(carta.numero)), carta);
+
+        for (int i = 0; i < 5; i++)
+            JMano.put(new JButton(), null);
 
         initGUI();
     }
@@ -45,17 +48,29 @@ public class JManoPanel extends JPanel {
         this.add(dinero);
 
         for (JButton JCarta : JMano.keySet()) {
+            JCarta.setSize(new Dimension(60, 80));
+            JCarta.setMinimumSize(new Dimension(60, 80));
+            JCarta.setPreferredSize(new Dimension(60, 80));
             JCarta.addActionListener(listener);
             this.add(JCarta);
         }
     }
 
     public void mostrarDinero() {
-        dinero.setText(Integer.toString(jugador.getDinero()));
+        dinero.setText(jugador.getDinero().toString());
     }
 
     public void descubrirCartas() {
+        List<Carta> mano = jugador.getMano();
+        List<JButton> JCartas = new ArrayList(JMano.keySet());
+        for (int i = 0; i < 5; i++)
+            JMano.replace(JCartas.get(i), mano.get(i));
 
+        Carta carta;
+        for (JButton JCarta : JMano.keySet()) {
+            carta = JMano.get(JCarta);
+            JCarta.setText(carta.numero + " " + carta.palo.toString().charAt(0));
+        }
     }
 
     public void taparCartas() {
