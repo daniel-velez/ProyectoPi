@@ -65,8 +65,8 @@ public class PokerView extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
-        this.setLocationRelativeTo(null);
         this.pack();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -190,7 +190,9 @@ public class PokerView extends JFrame {
     }
 
     public void updateMoney(Jugador player) {
-            playersView.get(player).mostrarDinero();
+        playersView.get(player).mostrarDinero();
+        revalidate();
+        repaint();
     }
 
     public void descubrirCartas(Jugador player) {

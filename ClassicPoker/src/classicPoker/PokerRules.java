@@ -46,13 +46,12 @@ public class PokerRules {
      */
     public static int determinarMano(List<Carta> mano) {
         ordenarMano(mano);
-        int manoPoker = -1;
+        int valorMano = 11;
 
-        if (escaleraReal(mano)) {
-            manoPoker = 1;
-        }
+        if (escaleraReal(mano)) 
+            valorMano = 1;
 
-        return manoPoker;
+        return valorMano;
     }
 
     /**
@@ -181,25 +180,5 @@ public class PokerRules {
                 return 0;
             }
         });
-    }
-
-    //! No he probado este metodo xd
-    /**
-     * Ordena de manera ascendente una lista de cartas usando el algoritmo burbuja.
-     */
-    public static void burbuja(List<Carta> A) {
-        int i, j;
-        Carta aux;
-        for (i = 0; i < A.size() - 1; i++) {
-            for (j = 0; j < A.size() - i - 1; j++) {
-                if (A.get(j + 1).numero < A.get(j).numero) {
-                    aux = A.get(j + 1);
-                    A.remove(j + 1);
-                    A.add(j + 1, A.get(j));
-                    A.remove(j);
-                    A.add(j, aux);
-                }
-            }
-        }
     }
 }

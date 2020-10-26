@@ -8,6 +8,7 @@ package classicPoker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JButton;
 
@@ -45,8 +46,10 @@ public class Jugador {
      * @param cantidad la cantidad de dinero
      */
     public void aportar(int cantidad) {
-        dinero -= cantidad;
-        pokerView.updateMoney(this);
+        if(dinero>=cantidad) {
+            dinero -= cantidad;
+            pokerView.updateMoney(this);
+        }
     }
 
     /**
@@ -63,8 +66,25 @@ public class Jugador {
      * @param carrier valor para igualar la apuesta
      * @return valor de la apuesta o null en caso de pasar, retirarse
      */
-    public int apostar(int carrier) {
-        return 0;
+    public int apostar(int carrier, int apuestaActual) {
+        Random aleatorio = new Random();
+        int valorMazo =  aleatorio.nextInt(3);
+
+        //pasar
+        if (valorMazo == 0) {
+            return -1;
+        }
+       
+        //aumentar
+        else if (valorMazo == 1) {
+            int nuevaApuesta =  aleatorio.nextInt(dinero);
+            aportar(nuevaApuesta+carrier);
+            return (nuevaApuesta+carrier+apuestaActual);
+        }
+        
+        //igualar
+        aportar(carrier);
+        return (carrier+apuestaActual);
     }
 
     /**
@@ -115,20 +135,17 @@ public class Jugador {
         return mano;
     }
 
+    /**
+     * 
+     * @param index1
+     * @param index2
+     */
 	public void cambiarCartas(int index1, int index2) {
         Carta carta1 = mano.get(index1);
         Carta carta2 = mano.get(index2);
         
         mano.set(index1, carta2);
         mano.set(index2, carta1);
-        
-        /*
-        mano.remove(index1);
-        mano.add(index1, mano.get(index2));
-
-        mano.remove(index2);
-        mano.add(index2, carta1);
-        */
 	}
 }
 

@@ -8,6 +8,7 @@
 package classicPoker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.awt.EventQueue;
  * Clase que modela el juego de poker clasico.
  */
 public class PokerGame implements Runnable {
-    
+
     private Map<Jugador, Integer> mesaDeApuesta;
     private MazoDeCartas mazo;
     private int turno; // de tipo int o Jugador <- pendiente.
@@ -90,17 +91,42 @@ public class PokerGame implements Runnable {
         rondaDeApuesta();
     }
 
+    /**
+     * 
+     */
     private void repartirCartas() {
         for (Jugador jugador : jugadores)
             jugador.recibirCartas(mazo.sacarCartas(5));
     }
 
+    /**
+     * 
+     */
     private void rondaDeApuesta() {
         int numeroRonda = 1;
+        int apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+        int carrier;
+        int nuevaApuesta;
 
+        for (Jugador jugador : jugadores) {
+            carrier = apuestaMasAlta - mesaDeApuesta.get(jugador);
+            nuevaApuesta = jugador.apostar(carrier, mesaDeApuesta.get(jugador));
+            if (nuevaApuesta != -1)
+                mesaDeApuesta.replace(jugador, nuevaApuesta);
+            apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
         while (seHanIgualadoTodasLasApuestas()) {
             numeroRonda += 1;
         }
+        
 
         rondaDeDescarte(); // ! una manera de escoger entre descarte o descubrir cartas
         descubrirCartas();
@@ -124,23 +150,10 @@ public class PokerGame implements Runnable {
 
     private boolean seHanIgualadoTodasLasApuestas() {
 
-        /*
-        for (int i = 1; i < mesaDeApuesta.length; i++)
-            if (mesaDeApuesta[i] != mesaDeApuesta[0])
-                return false;
-        */
-
         for (int i = 1; i < jugadores.size(); i++) {
             if (mesaDeApuesta.get(jugadores.get(i)) != mesaDeApuesta.get(jugadores.get(0)))
                 return false;
         }
-        /*
-        List<Jugador> listaJugadores = (List<Jugador>) mesaDeApuesta.keySet();
-        for (int i = 1; i < listaJugadores.size(); i++) {
-            if (mesaDeApuesta.get(listaJugadores.get(i)) != mesaDeApuesta.get(listaJugadores.get(0)))
-                return false;
-        }
-        */
         return true;
     }
 

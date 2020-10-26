@@ -64,6 +64,8 @@ public class JManoPanel extends JPanel {
 
     public void mostrarDinero() {
         dinero.setText(jugador.getDinero().toString());
+        revalidate();
+        repaint();  
     }
 
     public void descubrirCartas() {
