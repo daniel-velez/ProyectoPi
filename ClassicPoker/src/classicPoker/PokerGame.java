@@ -21,6 +21,7 @@ import java.awt.EventQueue;
  * Clase que modela el juego de poker clasico.
  */
 public class PokerGame implements Runnable {
+    
     private Map<Jugador, Integer> mesaDeApuesta;
     private MazoDeCartas mazo;
     private int turno; // de tipo int o Jugador <- pendiente.
@@ -128,11 +129,18 @@ public class PokerGame implements Runnable {
             if (mesaDeApuesta[i] != mesaDeApuesta[0])
                 return false;
         */
+
+        for (int i = 1; i < jugadores.size(); i++) {
+            if (mesaDeApuesta.get(jugadores.get(i)) != mesaDeApuesta.get(jugadores.get(0)))
+                return false;
+        }
+        /*
         List<Jugador> listaJugadores = (List<Jugador>) mesaDeApuesta.keySet();
         for (int i = 1; i < listaJugadores.size(); i++) {
             if (mesaDeApuesta.get(listaJugadores.get(i)) != mesaDeApuesta.get(listaJugadores.get(0)))
                 return false;
         }
+        */
         return true;
     }
 

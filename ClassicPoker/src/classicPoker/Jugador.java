@@ -9,6 +9,8 @@ package classicPoker;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
+
 /**
  * Clase que modela un jugador.
  */
@@ -112,7 +114,25 @@ public class Jugador {
     public List<Carta> getMano() {
         return mano;
     }
+
+	public void cambiarCartas(int index1, int index2) {
+        Carta carta1 = mano.get(index1);
+        Carta carta2 = mano.get(index2);
+        
+        mano.set(index1, carta2);
+        mano.set(index2, carta1);
+        
+        /*
+        mano.remove(index1);
+        mano.add(index1, mano.get(index2));
+
+        mano.remove(index2);
+        mano.add(index2, carta1);
+        */
+	}
 }
+
+
 
 /**
  * enum que contiene los tipos de jugador (simulado o usuario).

@@ -38,7 +38,6 @@ public class PokerView extends JFrame {
     private List<Jugador> jugadores;
     private Jugador usuario;
     private Map<Jugador, JManoPanel> playersView;
-    private JLabel userMoney, userName;
     private JLabel textBig, textSmall;
 
     private List<JButton> fichas;
@@ -121,12 +120,6 @@ public class PokerView extends JFrame {
         add(rowPane);
         rowPane.add(playersView.get(jugadores.get(4)));
 
-        userMoney = new JLabel();
-        userName = new JLabel();
-
-        userMoney.setText(Integer.toString(usuario.getDinero()));
-        userName.setText(usuario.getName());
-
         rowPane = new JPanel();
         rowPane.setLayout(new BorderLayout());
         add(rowPane);
@@ -134,8 +127,8 @@ public class PokerView extends JFrame {
         colPane = new JPanel();
         colPane.setLayout(new BoxLayout(colPane, BoxLayout.PAGE_AXIS));
 
-        colPane.add(userName);
-        colPane.add(userMoney);
+        colPane.add(playersView.get(jugadores.get(4)).getUserName());
+        colPane.add(playersView.get(jugadores.get(4)).getUserMoney());
         rowPane.add(colPane, BorderLayout.LINE_START);
 
         //# Botones
@@ -197,10 +190,7 @@ public class PokerView extends JFrame {
     }
 
     public void updateMoney(Jugador player) {
-        if (player.getTipo() == TipoJugador.Simulado)
             playersView.get(player).mostrarDinero();
-        else
-            userMoney.setText(player.getDinero().toString());
     }
 
     public void descubrirCartas(Jugador player) {
