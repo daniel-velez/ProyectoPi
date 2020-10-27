@@ -21,20 +21,27 @@ public class Jugador {
     private String nombre;
     private List<Carta> mano;
     private TipoJugador tipo;
-    private boolean seHaRetirado;
+    private boolean retirado;
+
     private PokerView pokerView;
+    private JManoPanel manoPanel;
+    private MazoDeCartas mazo;
+
+    private Random aleatorio;
 
     /**
      * Instantiates a new jugador.
      * @param dinero el dinero del jugador
      * @param tipo el tipo de jugador (simulado o usuario). 
      */
-    public Jugador(int dinero, TipoJugador tipo) {
+    public Jugador(int dinero, TipoJugador tipo, MazoDeCartas mazo, String nombre) {
         this.dinero = dinero;
         this.tipo = tipo;
-        this.seHaRetirado = false;
+        this.retirado = false;
         this.mano = new ArrayList<Carta>();
-        this.nombre = "Test";
+        this.mazo = mazo;
+        this.nombre = nombre;
+        this.aleatorio = new Random();
     }
 
     public void defineView(PokerView pokerView) {
@@ -45,10 +52,14 @@ public class Jugador {
      * Aporta la cantidad de dinero a la mesa de apuesta
      * @param cantidad la cantidad de dinero
      */
-    public void aportar(int cantidad) {
-        if(dinero>=cantidad) {
+    public int aportar(int cantidad) {
+        if (dinero >= cantidad) {
             dinero -= cantidad;
             pokerView.updateMoney(this);
+            return cantidad;
+        } else {
+            //! manejar el caso en el que se haya quedado sin dinero
+            return 0;
         }
     }
 
@@ -61,30 +72,58 @@ public class Jugador {
         pokerView.descubrirCartas(this);
     }
 
+    public int apostar() throws InterruptedException {
+        if (tipo == TipoJugador.Usuario)
+            return aportar(pokerView.apostar());
+
+        pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
+
+        int randomDecision = aleatorio.nextInt(2) + 1;
+        if (randomDecision == 1) { //apostar
+            int nuevaApuesta = aportar(aleatorio.nextInt(dinero / 10) / 100 * 100);
+            pokerView.showMessage(nombre + " ha apostado $" + nuevaApuesta, TimeControl.jugadorHaTomadoDecision);
+            return nuevaApuesta;
+        }
+        pokerView.showMessage(nombre + " ha cedido el turno", TimeControl.jugadorHaTomadoDecision);
+        return 0; //pasar
+    }
+
     /**
      * Simula la decision de apostar
      * @param carrier valor para igualar la apuesta
      * @return valor de la apuesta o null en caso de pasar, retirarse
+     * @throws InterruptedException
      */
-    public int apostar(int carrier, int apuestaActual) {
-        Random aleatorio = new Random();
-        int valorMazo =  aleatorio.nextInt(3);
+    public int apostar(int valorParaIgualar) throws InterruptedException {
+        if (tipo == TipoJugador.Usuario)
+            return aportar(pokerView.apostar(valorParaIgualar));
 
-        //pasar
-        if (valorMazo == 0) {
-            return -1;
+        pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
+
+        int randomDecision = aleatorio.nextInt(3) + 1;
+
+        if (randomDecision == 1) { //igualar
+            pokerView.showMessage(nombre + " ha igualado la apuesta", TimeControl.jugadorHaTomadoDecision);
+            return aportar(valorParaIgualar);
         }
-       
-        //aumentar
-        else if (valorMazo == 1) {
-            int nuevaApuesta =  aleatorio.nextInt(dinero);
-            aportar(nuevaApuesta+carrier);
-            return (nuevaApuesta+carrier+apuestaActual);
+        if (randomDecision == 2) { //aumentar
+            int nuevaApuesta = aportar(aleatorio.nextInt(dinero / 10) / 100 * 100);
+            pokerView.showMessage(nombre + " ha incrementado la apuesta en $" + nuevaApuesta,
+                    TimeControl.jugadorHaTomadoDecision);
+            return nuevaApuesta + valorParaIgualar;
         }
-        
-        //igualar
-        aportar(carrier);
-        return (carrier+apuestaActual);
+
+        //retirarse
+        retirarse();
+        pokerView.showMessage(nombre + " se ha retirado", TimeControl.jugadorHaTomadoDecision);
+        return 0;
+    }
+
+    public void retirarse() {
+        mazo.descartar(mano);
+        mano.clear();
+        manoPanel.descartar();
+        retirado = true;
     }
 
     /**
@@ -99,8 +138,8 @@ public class Jugador {
      * determina si el jugador esta jugando.
      * @return true si el jugador no se ha retirado.
      */
-    public boolean estaJugando() {
-        return !seHaRetirado;
+    public boolean seHaRetirado() {
+        return retirado;
     }
 
     // #---------------------------------------------------------------------------
@@ -135,21 +174,27 @@ public class Jugador {
         return mano;
     }
 
+    // #---------------------------------------------------------------------------
+    // # SETTERS
+    // #---------------------------------------------------------------------------
+
+    public void setManoPanel(JManoPanel manoPanel) {
+        this.manoPanel = manoPanel;
+    }
+
     /**
      * 
      * @param index1
      * @param index2
      */
-	public void cambiarCartas(int index1, int index2) {
+    public void cambiarCartas(int index1, int index2) {
         Carta carta1 = mano.get(index1);
         Carta carta2 = mano.get(index2);
-        
+
         mano.set(index1, carta2);
         mano.set(index2, carta1);
-	}
+    }
 }
-
-
 
 /**
  * enum que contiene los tipos de jugador (simulado o usuario).

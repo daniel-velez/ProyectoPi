@@ -36,13 +36,17 @@ public class PokerView extends JFrame {
 
     private JInstruccionesPanel instrucciones;
     private List<Jugador> jugadores;
-    private Jugador usuario;
     private Map<Jugador, JManoPanel> playersView;
     private JLabel textBig, textSmall;
 
     private List<JButton> fichas;
     private JButton apostar, pasar, igualar, aumentar, descartar;
     private JButton retirarse, ayuda, levantarse, saltar;
+    private JPanel fichasPanel, opcionesPanel;
+
+    private Jugador jugador;
+    private int apuestaDelJugador;
+    private int valorParaIgualar;
 
     private Escucha listener;
 
@@ -54,10 +58,9 @@ public class PokerView extends JFrame {
         this.jugadores = jugadores;
         this.instrucciones = new JInstruccionesPanel();
 
-        for (Jugador jugador : jugadores) {
+        for (Jugador jugador : jugadores)
             if (jugador.getTipo() == TipoJugador.Usuario)
-                usuario = jugador;
-        }
+                this.jugador = jugador;
 
         initGUI();
 
@@ -76,27 +79,31 @@ public class PokerView extends JFrame {
         this.setLayout(new GridLayout(4, 1)); // olvide que si se pone 1 columna solo la ocupa 1 componente
         JPanel rowPane = new JPanel();
         JPanel colPane = new JPanel();
+        fichasPanel = new JPanel();
+        opcionesPanel = new JPanel();
         listener = new Escucha();
 
         //# Vista de los jugadores
 
         playersView = new HashMap<Jugador, JManoPanel>();
-        for (Jugador jugador : jugadores)
+        for (Jugador jugador : jugadores) {
             playersView.put(jugador, new JManoPanel(jugador));
+            jugador.setManoPanel(playersView.get(jugador));
+        }
 
         rowPane.setLayout(new FlowLayout());
         add(rowPane);
 
-        rowPane.add(playersView.get(jugadores.get(0)));
-        rowPane.add(Box.createRigidArea(new Dimension(50, 0)));
         rowPane.add(playersView.get(jugadores.get(1)));
+        rowPane.add(Box.createRigidArea(new Dimension(50, 0)));
+        rowPane.add(playersView.get(jugadores.get(2)));
 
         //# Indicaciones
 
         rowPane = new JPanel();
         rowPane.setLayout(new FlowLayout());
         add(rowPane);
-        rowPane.add(playersView.get(jugadores.get(2)));
+        rowPane.add(playersView.get(jugadores.get(0)));
 
         colPane.setLayout(new BoxLayout(colPane, BoxLayout.PAGE_AXIS));
         textBig = new JLabel("textBig");
@@ -106,7 +113,7 @@ public class PokerView extends JFrame {
         //textBig.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         colPane.add(textBig);
 
-        textSmall.setPreferredSize(new Dimension(100, 40));
+        textSmall.setPreferredSize(new Dimension(400, 40));
         //textSmall.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         colPane.add(textSmall);
 
@@ -140,44 +147,40 @@ public class PokerView extends JFrame {
         fichas.add(new JButton("500"));
         fichas.add(new JButton("1000"));
 
-        for (JButton boton : fichas) {
-            configurarBoton(boton, listener);
+        for (JButton ficha : fichas) {
+            fichasPanel.add(ficha);
+            configurarBoton(ficha, listener);
         }
+        rowPane.add(fichasPanel, BorderLayout.CENTER);
 
-        apostar = new JButton();
-        configurarBoton(apostar, listener);
+        apostar = new JButton("Apostar");
+        pasar = new JButton("Pasar");
+        igualar = new JButton("Igualar");
+        aumentar = new JButton("Aumentar");
+        retirarse = new JButton("Retirarse");
+        descartar = new JButton("Descartar");
+        levantarse = new JButton("Levantarse");
+        saltar = new JButton("Saltar");
+        ayuda = new JButton("Ayuda");
 
-        pasar = new JButton();
-        configurarBoton(pasar, listener);
+        opcionesPanel.add(apostar);
+        opcionesPanel.add(pasar);
+        opcionesPanel.add(igualar);
+        opcionesPanel.add(aumentar);
+        opcionesPanel.add(retirarse);
+        opcionesPanel.add(levantarse);
+        opcionesPanel.add(ayuda);
 
-        igualar = new JButton();
-        configurarBoton(igualar, listener);
+        igualar.addActionListener(listener);
+        retirarse.addActionListener(listener);
 
-        aumentar = new JButton();
-        configurarBoton(aumentar, listener);
+        apostar.setVisible(false);
+        pasar.setVisible(false);
+        igualar.setVisible(false);
+        aumentar.setVisible(false);
+        retirarse.setVisible(false);
 
-        retirarse = new JButton();
-        configurarBoton(retirarse, listener);
-
-        descartar = new JButton();
-        configurarBoton(descartar, listener);
-
-        levantarse = new JButton();
-        configurarBoton(levantarse, listener);
-
-        saltar = new JButton();
-        configurarBoton(saltar, listener);
-
-        ayuda = new JButton();
-        configurarBoton(ayuda, listener);
-
-        //rowPane.add(apostar);
-        //rowPane.add(pasar);
-        //rowPane.add(igualar);
-        //rowPane.add(aumentar);
-        //rowPane.add(retirarse);
-        //rowPane.add(descartar);
-
+        rowPane.add(opcionesPanel, BorderLayout.LINE_END);
     }
 
     // #---------------------------------------------------------------------------
@@ -200,7 +203,43 @@ public class PokerView extends JFrame {
         playersView.get(player).descubrirCartas();
     }
 
-    //# Metodos para click de los botones
+    public synchronized int apostar() throws InterruptedException {
+        textSmall.setText("Es tu turno");
+        apostar.setVisible(true);
+        pasar.setVisible(true);
+        wait();
+        apostar.setEnabled(false);
+        pasar.setEnabled(false);
+        return apuestaDelJugador;
+    }
+
+    public synchronized int apostar(int valorParaIgualar) throws InterruptedException {
+        textSmall.setText("Es tu turno");
+        this.valorParaIgualar = valorParaIgualar;
+        igualar.setVisible(true);
+        aumentar.setVisible(true);
+        retirarse.setVisible(true);
+        wait();
+        igualar.setEnabled(false);
+        aumentar.setEnabled(false);
+        retirarse.setEnabled(false);
+        return apuestaDelJugador;
+    }
+
+    // #---------------------------------------------------------------------------
+    // # Eventos
+    // #---------------------------------------------------------------------------
+
+    private synchronized void onIgualarClick() {
+        apuestaDelJugador = valorParaIgualar;
+        notifyAll();
+    }
+
+    private synchronized void onRetirarseClick() {
+        jugador.retirarse();
+        apuestaDelJugador = 0;
+        notifyAll();
+    }
 
     // #---------------------------------------------------------------------------
     // # Juego
@@ -265,6 +304,13 @@ public class PokerView extends JFrame {
 
                 }
             }
+
+            if (event.getSource() == igualar)
+                onIgualarClick();
+
+            if (event.getSource() == retirarse)
+                onRetirarseClick();
+
         }
     }
 }

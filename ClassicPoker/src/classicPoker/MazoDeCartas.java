@@ -61,10 +61,8 @@ public class MazoDeCartas {
      * @param cartas 
      */
     public void descartar(List<Carta> cartas) {
-
-        for (Carta carta : cartas) {
+        for (Carta carta : cartas)
             mazoDescarte.add(carta);
-        }
     }
 
 }

@@ -16,7 +16,7 @@ import java.awt.event.ActionListener;
 
 public class JManoPanel extends JPanel {
 
-    private List <JButton> JMano;
+    private List<JButton> JMano;
     private Jugador jugador;
     private JLabel nombre, dinero;
 
@@ -30,7 +30,7 @@ public class JManoPanel extends JPanel {
         this.ordenarCartas = true;
         this.cartasSeleccionadas = new ArrayList<JButton>();
 
-        JMano = new ArrayList <JButton>();
+        JMano = new ArrayList<JButton>();
 
         for (int i = 0; i < 5; i++)
             JMano.add(new JButton());
@@ -65,19 +65,24 @@ public class JManoPanel extends JPanel {
     public void mostrarDinero() {
         dinero.setText(jugador.getDinero().toString());
         revalidate();
-        repaint();  
+        repaint();
     }
 
     public void descubrirCartas() {
 
         List<Carta> mano = jugador.getMano();
 
-        for (int i = 0; i<JMano.size(); i++) 
+        for (int i = 0; i < JMano.size(); i++)
             JMano.get(i).setText(mano.get(i).numero + " " + mano.get(i).palo.toString().charAt(0));
     }
 
     public void taparCartas() {
 
+    }
+
+    public void descartar() {
+        for (JButton JCarta : JMano)
+            JCarta.setText(null);
     }
 
     /**
@@ -129,7 +134,7 @@ public class JManoPanel extends JPanel {
                 int index = JMano.indexOf(cartasSeleccionadas.get(0));
                 JButton boton = JCarta;
                 List <Carta> mano = jugador.getMano();
-
+                
                 JMano.get(JMano.indexOf(cartasSeleccionadas.get(0))).setText(boton.getText());
                 JCarta.setText(mano.get(index).numero + " " + mano.get(index).palo.toString().charAt(0));
                 */

@@ -43,11 +43,11 @@ public class PokerGame implements Runnable {
 
         // crear los jugadores y darles el dinero inicial
         jugadores = new ArrayList<Jugador>();
-        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
-        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
-        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
-        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado));
-        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Usuario));
+        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado, mazo, "P1"));
+        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado, mazo, "P2"));
+        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado, mazo, "P3"));
+        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Simulado, mazo, "P4"));
+        jugadores.add(new Jugador(getRandomMoney(), TipoJugador.Usuario, mazo, "User"));
 
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -76,17 +76,17 @@ public class PokerGame implements Runnable {
         pokerView.iniciarRonda();
 
         // hacer la apuesta inicial
-        for (Jugador jugador : jugadores) {
-            jugador.aportar(apuestaInicial);
-            mesaDeApuesta.put(jugador, apuestaInicial);
-        }
+        for (Jugador jugador : jugadores)
+            mesaDeApuesta.put(jugador, jugador.aportar(apuestaInicial));
 
         pokerView.showMessage("Apuesta inicial: $" + apuestaInicial, 3000);
 
         repartirCartas();
 
+        //! voy a comentar shuffle para que el orden de los turnos siempre sea el mismo, 
+        //! mientras hacemos las pruebas
         // selecciona el jugador “mano”
-        Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
+        //Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
 
         rondaDeApuesta();
     }
@@ -102,34 +102,33 @@ public class PokerGame implements Runnable {
     /**
      * 
      */
-    private void rondaDeApuesta() {
+    private void rondaDeApuesta() throws InterruptedException {
         int numeroRonda = 1;
-        int apuestaMasAlta = Collections.max(mesaDeApuesta.values());
-        int carrier;
-        int nuevaApuesta;
+        int apuestaMasAlta = apuestaInicial;
 
         for (Jugador jugador : jugadores) {
-            carrier = apuestaMasAlta - mesaDeApuesta.get(jugador);
-            nuevaApuesta = jugador.apostar(carrier, mesaDeApuesta.get(jugador));
-            if (nuevaApuesta != -1)
-                mesaDeApuesta.replace(jugador, nuevaApuesta);
-            apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+            if (jugador.seHaRetirado())
+                continue;
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            if (apuestaMasAlta == apuestaInicial)
+                mesaDeApuestaUpdate(jugador, jugador.apostar());
+            else
+                mesaDeApuestaUpdate(jugador, jugador.apostar(apuestaMasAlta - mesaDeApuesta.get(jugador)));
+
+            if (mesaDeApuesta.get(jugador) > apuestaMasAlta)
+                apuestaMasAlta = mesaDeApuesta.get(jugador);
         }
-        
+
         while (seHanIgualadoTodasLasApuestas()) {
             numeroRonda += 1;
         }
-        
 
         rondaDeDescarte(); // ! una manera de escoger entre descarte o descubrir cartas
         descubrirCartas();
+    }
+
+    private void mesaDeApuestaUpdate(Jugador jugador, int val) {
+        mesaDeApuesta.replace(jugador, mesaDeApuesta.get(jugador) + val);
     }
 
     private void rondaDeDescarte() {
