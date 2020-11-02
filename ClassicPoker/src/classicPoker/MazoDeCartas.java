@@ -31,8 +31,7 @@ public class MazoDeCartas {
      * Crea una baraja de cartas organizada.
      */
     public void crearBaraja() {
-        for (Palos palo : Palos.values())
-            //crear las cartas de cada palo
+        for (Palos palo : Palos.values()) //crear las cartas de cada palo
             for (int i = 2; i <= 14; i++)
                 cartas.add(new Carta(i, palo));
     }

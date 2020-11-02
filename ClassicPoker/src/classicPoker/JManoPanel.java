@@ -1,11 +1,13 @@
+/*
+ * Programacion Interactiva
+ * Autor: Julian Andres Orejuela Erazo - 1541304 
+ * Autor: Daniel Felipe Velez Cuaical - 1924306
+ * Mini proyecto 3: Juego de poker clasico.
+ */
 package classicPoker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -56,8 +58,8 @@ public class JManoPanel extends JPanel {
                 JCarta.setSize(new Dimension(100, 120));
                 JCarta.setMinimumSize(new Dimension(100, 120));
                 JCarta.setPreferredSize(new Dimension(100, 120));
+                JCarta.addActionListener(listener);
             }
-            JCarta.addActionListener(listener);
             this.add(JCarta);
         }
     }
@@ -80,6 +82,9 @@ public class JManoPanel extends JPanel {
 
     }
 
+    /**
+     * 
+     */
     public void descartar() {
         for (JButton JCarta : JMano)
             JCarta.setText(null);
@@ -106,6 +111,7 @@ public class JManoPanel extends JPanel {
 
     /**
      * 
+     * @return
      */
     public JLabel getUserMoney() {
         return dinero;
@@ -155,9 +161,13 @@ public class JManoPanel extends JPanel {
          */
         @Override
         public void actionPerformed(ActionEvent event) {
+
+            onJCartaClick((JButton) event.getSource());
+            /*
             for (JButton JCarta : JMano)
                 if (event.getSource() == JCarta)
                     onJCartaClick(JCarta);
+            */
         }
     }
 }

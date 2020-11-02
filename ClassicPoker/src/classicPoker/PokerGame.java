@@ -8,13 +8,11 @@
 package classicPoker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import java.awt.EventQueue;
 
@@ -28,6 +26,8 @@ public class PokerGame implements Runnable {
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
     private int apuestaInicial;
+    //private int apuestaMasAlta;
+    private int numeroRonda = 0;
     private PokerView pokerView;
 
     private Random aleatorio;
@@ -60,6 +60,9 @@ public class PokerGame implements Runnable {
         });
     }
 
+    /**
+     * 
+     */
     @Override
     public void run() {
         try {
@@ -72,14 +75,21 @@ public class PokerGame implements Runnable {
         }
     }
 
+    /**
+     * 
+     * @throws InterruptedException
+     */
     private void iniciarRonda() throws InterruptedException {
         pokerView.iniciarRonda();
 
         // hacer la apuesta inicial
+        pokerView.showMessage("Apuesta inicial: $" + apuestaInicial, 3000);
+
         for (Jugador jugador : jugadores)
             mesaDeApuesta.put(jugador, jugador.aportar(apuestaInicial));
-
-        pokerView.showMessage("Apuesta inicial: $" + apuestaInicial, 3000);
+        
+        pokerView.showMessage("Cada jugador ha hecho su apuesta inicial", 2000);
+        pokerView.showBigMessage("Monto de la apuesta: " + getMontoApuestas());
 
         repartirCartas();
 
@@ -88,7 +98,14 @@ public class PokerGame implements Runnable {
         // selecciona el jugador “mano”
         //Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
 
-        rondaDeApuesta();
+        do {
+            rondaDeApuesta();
+        } while (!seHanIgualadoTodasLasApuestas());
+        determinarJuego();
+        rondaDeDescarte(); // ! una manera de escoger entre descarte o descubrir cartas
+        //rondaDeApuesta();
+        //descubrirCartas();
+        //determinarJuego();
     }
 
     /**
@@ -101,46 +118,80 @@ public class PokerGame implements Runnable {
 
     /**
      * 
+     * @throws InterruptedException
      */
     private void rondaDeApuesta() throws InterruptedException {
-        int numeroRonda = 1;
-        int apuestaMasAlta = apuestaInicial;
+        numeroRonda += 1;
+        int apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+        boolean ultimaRonda = numeroRonda == 3 ? true : false;
+
+        if (numeroRonda == 1)
+            pokerView.showMessage("Empieza la ronda de apuesta", 2000);
+        else 
+            pokerView.showMessage("Empieza otra ronda de apuesta", 2000);
+            
 
         for (Jugador jugador : jugadores) {
             if (jugador.seHaRetirado())
                 continue;
 
             if (apuestaMasAlta == apuestaInicial)
-                mesaDeApuestaUpdate(jugador, jugador.apostar());
+                mesaDeApuestaUpdate(jugador, jugador.apostar(ultimaRonda));
             else
-                mesaDeApuestaUpdate(jugador, jugador.apostar(apuestaMasAlta - mesaDeApuesta.get(jugador)));
+                mesaDeApuestaUpdate(jugador, jugador.apostar(apuestaMasAlta - mesaDeApuesta.get(jugador), ultimaRonda));
 
-            if (mesaDeApuesta.get(jugador) > apuestaMasAlta)
-                apuestaMasAlta = mesaDeApuesta.get(jugador);
+            apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+            pokerView.showBigMessage("Monto de la apuesta: " + getMontoApuestas());
         }
-
-        while (seHanIgualadoTodasLasApuestas()) {
-            numeroRonda += 1;
-        }
-
-        rondaDeDescarte(); // ! una manera de escoger entre descarte o descubrir cartas
-        descubrirCartas();
     }
 
+    /**
+     * 
+     * @param jugador
+     * @param val
+     */
     private void mesaDeApuestaUpdate(Jugador jugador, int val) {
         mesaDeApuesta.replace(jugador, mesaDeApuesta.get(jugador) + val);
     }
 
-    private void rondaDeDescarte() {
+    /**
+     * 
+     * @throws InterruptedException
+     */
+    private void rondaDeDescarte() throws InterruptedException {
+        pokerView.showMessage("Empieza la ronda de descarte", 0);
+
 
     }
 
+    /**
+     * Muestra el contenido de las cartas de los jugadores.
+     */
     private void descubrirCartas() {
-        determinarJuego();
+        for (Jugador jugador : jugadores) 
+            jugador.descubrirCartas();
     }
 
-    private void determinarJuego() {
+    /**
+     * 
+     * @throws InterruptedException
+     */
+    private void determinarJuego() throws InterruptedException {
+        if (jugadores.size() == 1 && jugadores.get(0).getTipo() == TipoJugador.Usuario) 
+            pokerView.showBigMessage("Has ganado");
+        
 
+    }
+
+    /**
+     * Obtiene el monto de apuestas de la mesa de apuesta.
+     * @return la suma de los valores de la mesa de apuestas
+     */
+    private int getMontoApuestas() {
+        int monto = 0;
+        for (Integer val : mesaDeApuesta.values()) 
+            monto+=val;
+        return monto;
     }
 
     // #---------------------------------------------------------------------------
@@ -149,8 +200,15 @@ public class PokerGame implements Runnable {
 
     private boolean seHanIgualadoTodasLasApuestas() {
 
-        for (int i = 1; i < jugadores.size(); i++) {
-            if (mesaDeApuesta.get(jugadores.get(i)) != mesaDeApuesta.get(jugadores.get(0)))
+        int apuestaMasAlta = Collections.max(mesaDeApuesta.values());
+
+        if (jugadores.size() == 1)
+            return true;
+
+        for (Jugador jugador : jugadores) {
+            if (jugador.seHaRetirado())
+                continue;
+            if (mesaDeApuesta.get(jugador) != apuestaMasAlta) 
                 return false;
         }
         return true;

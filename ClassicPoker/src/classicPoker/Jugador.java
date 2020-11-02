@@ -59,7 +59,7 @@ public class Jugador {
             return cantidad;
         } else {
             //! manejar el caso en el que se haya quedado sin dinero
-            return 0;
+            return -1;
         }
     }
 
@@ -72,13 +72,21 @@ public class Jugador {
         pokerView.descubrirCartas(this);
     }
 
-    public int apostar() throws InterruptedException {
+    /**
+     * 
+     * @param ultimaRonda
+     * @return
+     * @throws InterruptedException
+     */
+    public int apostar(boolean ultimaRonda) throws InterruptedException {
         if (tipo == TipoJugador.Usuario)
             return aportar(pokerView.apostar());
 
         pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
+        
 
         int randomDecision = aleatorio.nextInt(2) + 1;
+        randomDecision = 2;
         if (randomDecision == 1) { //apostar
             int nuevaApuesta = aportar(aleatorio.nextInt(dinero / 10) / 100 * 100);
             pokerView.showMessage(nombre + " ha apostado $" + nuevaApuesta, TimeControl.jugadorHaTomadoDecision);
@@ -94,19 +102,24 @@ public class Jugador {
      * @return valor de la apuesta o null en caso de pasar, retirarse
      * @throws InterruptedException
      */
-    public int apostar(int valorParaIgualar) throws InterruptedException {
-        if (tipo == TipoJugador.Usuario)
-            return aportar(pokerView.apostar(valorParaIgualar));
+    public int apostar(int valorParaIgualar, boolean ultimaRonda) throws InterruptedException {
+
+        if (tipo == TipoJugador.Usuario) {
+            if (ultimaRonda) 
+                return aportar(pokerView.apostar(valorParaIgualar, true));
+            else 
+                return aportar(pokerView.apostar(valorParaIgualar, false));
+        }
 
         pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
 
-        int randomDecision = aleatorio.nextInt(3) + 1;
+        int randomDecision = ultimaRonda? aleatorio.nextInt(2) + 1 : aleatorio.nextInt(3) + 1;
 
         if (randomDecision == 1) { //igualar
             pokerView.showMessage(nombre + " ha igualado la apuesta", TimeControl.jugadorHaTomadoDecision);
             return aportar(valorParaIgualar);
         }
-        if (randomDecision == 2) { //aumentar
+        if (randomDecision == 3) { //aumentar
             int nuevaApuesta = aportar(aleatorio.nextInt(dinero / 10) / 100 * 100);
             pokerView.showMessage(nombre + " ha incrementado la apuesta en $" + nuevaApuesta,
                     TimeControl.jugadorHaTomadoDecision);
@@ -119,6 +132,9 @@ public class Jugador {
         return 0;
     }
 
+    /**
+     * Simula la decicison de retirarse.
+     */
     public void retirarse() {
         mazo.descartar(mano);
         mano.clear();
@@ -140,6 +156,11 @@ public class Jugador {
      */
     public boolean seHaRetirado() {
         return retirado;
+    }
+
+
+    public void descubrirCartas() {
+        manoPanel.descubrirCartas();
     }
 
     // #---------------------------------------------------------------------------

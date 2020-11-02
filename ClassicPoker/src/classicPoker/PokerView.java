@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -28,9 +29,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 /**
- * Clase encargada de representar el juego y de realizar las operaciones de E/S por medio de un JFrame.
+ * Clase encargada de representar el juego y de realizar las operaciones de E/S
+ * por medio de un JFrame.
  */
 public class PokerView extends JFrame {
 
@@ -76,14 +79,14 @@ public class PokerView extends JFrame {
      * Inits the GUI.
      */
     private void initGUI() {
-        this.setLayout(new GridLayout(4, 1)); // olvide que si se pone 1 columna solo la ocupa 1 componente
+        this.setLayout(new GridLayout(4, 1)); 
         JPanel rowPane = new JPanel();
         JPanel colPane = new JPanel();
         fichasPanel = new JPanel();
         opcionesPanel = new JPanel();
         listener = new Escucha();
 
-        //# Vista de los jugadores
+        // # Vista de los jugadores
 
         playersView = new HashMap<Jugador, JManoPanel>();
         for (Jugador jugador : jugadores) {
@@ -98,7 +101,7 @@ public class PokerView extends JFrame {
         rowPane.add(Box.createRigidArea(new Dimension(50, 0)));
         rowPane.add(playersView.get(jugadores.get(2)));
 
-        //# Indicaciones
+        // # Indicaciones
 
         rowPane = new JPanel();
         rowPane.setLayout(new FlowLayout());
@@ -110,17 +113,17 @@ public class PokerView extends JFrame {
         textSmall = new JLabel("textSmall");
 
         textBig.setPreferredSize(new Dimension(200, 40));
-        //textBig.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        // textBig.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         colPane.add(textBig);
 
         textSmall.setPreferredSize(new Dimension(400, 40));
-        //textSmall.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        // textSmall.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         colPane.add(textSmall);
 
         rowPane.add(colPane);
         rowPane.add(playersView.get(jugadores.get(3)));
 
-        //# Usuario
+        // # Usuario
 
         rowPane = new JPanel();
         rowPane.setLayout(new FlowLayout());
@@ -138,7 +141,7 @@ public class PokerView extends JFrame {
         colPane.add(playersView.get(jugadores.get(4)).getUserMoney());
         rowPane.add(colPane, BorderLayout.LINE_START);
 
-        //# Botones
+        // # Botones
 
         fichas = new ArrayList<JButton>();
 
@@ -148,8 +151,9 @@ public class PokerView extends JFrame {
         fichas.add(new JButton("1000"));
 
         for (JButton ficha : fichas) {
-            fichasPanel.add(ficha);
             configurarBoton(ficha, listener);
+            ficha.setVisible(false);
+            fichasPanel.add(ficha);
         }
         rowPane.add(fichasPanel, BorderLayout.CENTER);
 
@@ -172,7 +176,11 @@ public class PokerView extends JFrame {
         opcionesPanel.add(ayuda);
 
         igualar.addActionListener(listener);
+        aumentar.addActionListener(listener);
         retirarse.addActionListener(listener);
+
+        apostar.addActionListener(listener);
+        pasar.addActionListener(listener);
 
         apostar.setVisible(false);
         pasar.setVisible(false);
@@ -187,42 +195,82 @@ public class PokerView extends JFrame {
     // # Métodos desde control a la vista
     // #---------------------------------------------------------------------------
 
+    /**
+     * 
+     * @param msg
+     * @param time
+     * @throws InterruptedException
+     */
     public void showMessage(String msg, int time) throws InterruptedException {
         textSmall.setText(msg);
         Thread.sleep(time);
     }
 
+    /**
+     * 
+     * @param msg
+     * @throws InterruptedException
+     */
+    public void showBigMessage(String msg) throws InterruptedException {
+        textBig.setText(msg);
+    }
+
+    /**
+     * 
+     * @param player
+     */
     public void updateMoney(Jugador player) {
         playersView.get(player).mostrarDinero();
         revalidate();
         repaint();
     }
 
+    /**
+     * 
+     * @param player
+     */
     public void descubrirCartas(Jugador player) {
-        //! condicional sobre el tipo de jugador
+        // ! condicional sobre el tipo de jugador
         playersView.get(player).descubrirCartas();
     }
 
+    /**
+     * 
+     * @return
+     * @throws InterruptedException
+     */
     public synchronized int apostar() throws InterruptedException {
         textSmall.setText("Es tu turno");
         apostar.setVisible(true);
         pasar.setVisible(true);
         wait();
-        apostar.setEnabled(false);
-        pasar.setEnabled(false);
+        quitarFichas(true);
+        aumentar.setText("Aumentar");
+        aumentar.setVisible(false);
         return apuestaDelJugador;
     }
 
-    public synchronized int apostar(int valorParaIgualar) throws InterruptedException {
+    /**
+     * 
+     * @param valorParaIgualar
+     * @param ultimaRonda
+     * @return
+     * @throws InterruptedException
+     */
+    public synchronized int apostar(int valorParaIgualar, boolean ultimaRonda) throws InterruptedException {
         textSmall.setText("Es tu turno");
         this.valorParaIgualar = valorParaIgualar;
+        apuestaDelJugador = 0;
         igualar.setVisible(true);
         aumentar.setVisible(true);
-        retirarse.setVisible(true);
-        wait();
-        igualar.setEnabled(false);
         aumentar.setEnabled(false);
-        retirarse.setEnabled(false);
+        retirarse.setVisible(true);
+        quitarFichas(ultimaRonda);
+        wait();
+        quitarFichas(true);
+        igualar.setVisible(false);
+        aumentar.setVisible(false);
+        retirarse.setVisible(false);
         return apuestaDelJugador;
     }
 
@@ -230,11 +278,70 @@ public class PokerView extends JFrame {
     // # Eventos
     // #---------------------------------------------------------------------------
 
+    /**
+     * 
+     */
+    private synchronized void onApostarClick() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+
+                apuestaDelJugador = 0;
+
+                pasar.setVisible(false);
+                apostar.setVisible(false);
+                quitarFichas(false);
+                aumentar.setText("Hacer apuesta");
+                aumentar.setVisible(true);
+                aumentar.setEnabled(false);
+			}
+		});
+    }
+
+    /**
+     * 
+     */
+    private synchronized void onPasarClick() {
+        pasar.setVisible(false);
+        apostar.setVisible(false);
+        notifyAll();
+    }
+
+    /**
+     * 
+     */
     private synchronized void onIgualarClick() {
         apuestaDelJugador = valorParaIgualar;
         notifyAll();
     }
 
+    /**
+     * 
+     */
+    private synchronized void onAumentarClick() {
+        apuestaDelJugador += valorParaIgualar;
+        notifyAll();
+    }
+
+    /**
+     * 
+     * @param ficha
+     * @throws InterruptedException
+     */
+    private synchronized void onFichaClick(JButton ficha) throws InterruptedException {
+        apuestaDelJugador += Integer.parseInt(ficha.getText());
+        aumentar.setEnabled(true);
+        if (valorParaIgualar == 0)
+            showMessage("Tu apuesta: " + apuestaDelJugador, 0);
+        else
+            showMessage("Tu apuesta: " + valorParaIgualar + " + " + apuestaDelJugador, 0);
+    }
+
+    /**
+     * 
+     */
     private synchronized void onRetirarseClick() {
         jugador.retirarse();
         apuestaDelJugador = 0;
@@ -245,10 +352,13 @@ public class PokerView extends JFrame {
     // # Juego
     // #---------------------------------------------------------------------------
 
+    /**
+     * 
+     * @throws InterruptedException
+     */
     public void iniciarRonda() throws InterruptedException {
         for (int i = 3; i > 0; i--)
             showMessage("La ronda iniciará en " + i, 1000);
-
     }
 
     public void rondaDeApuesta() {
@@ -272,14 +382,23 @@ public class PokerView extends JFrame {
     // #---------------------------------------------------------------------------
 
     /**
-     * 
-     * @param boton el boton a configurar
+     * Configura un boton y le adiciona un escucha.
+     * @param boton   el boton a configurar
      * @param escucha el escucha de lso eventos
      */
     private void configurarBoton(JButton boton, Escucha escucha) {
-        //boton.setBorder(null);
-        //boton.setContentAreaFilled(false);
-        //boton.addActionListener(escucha);
+        // boton.setBorder(null);
+        // boton.setContentAreaFilled(false);
+        boton.addActionListener(escucha);
+    }
+
+    /**
+     * Hace las fichas visibles o invisibles.
+     * @param flag
+     */
+    private void quitarFichas(boolean flag) {
+        for (JButton ficha : fichas)
+            ficha.setVisible(!flag);
     }
 
     // #---------------------------------------------------------------------------
@@ -287,7 +406,8 @@ public class PokerView extends JFrame {
     // #---------------------------------------------------------------------------
 
     /**
-     * The Class Escucha. Clase interna encargada de manejar los eventos de la ventana.
+     * The Class Escucha. Clase interna encargada de manejar los eventos de la
+     * ventana.
      */
     private class Escucha implements ActionListener {
 
@@ -299,18 +419,29 @@ public class PokerView extends JFrame {
         @Override
         public void actionPerformed(ActionEvent event) {
 
-            for (JButton ficha : fichas) {
-                if (event.getSource() == ficha) {
-
+            int indexFicha = fichas.indexOf(event.getSource());
+            if (indexFicha != -1) {
+                try {
+                    onFichaClick(fichas.get(indexFicha));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
 
             if (event.getSource() == igualar)
                 onIgualarClick();
 
+            if (event.getSource() == aumentar)
+                onAumentarClick();
+
             if (event.getSource() == retirarse)
                 onRetirarseClick();
 
+            if (event.getSource() == apostar)
+                onApostarClick();
+
+            if (event.getSource() == pasar)
+                onPasarClick();
         }
     }
 }
