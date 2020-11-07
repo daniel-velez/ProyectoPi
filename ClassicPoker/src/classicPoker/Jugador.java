@@ -6,9 +6,13 @@
  */
 package classicPoker;
 
+import pokerView.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 
@@ -69,7 +73,7 @@ public class Jugador {
      */
     public void recibirCartas(List<Carta> cartas) {
         mano.addAll(cartas);
-        pokerView.descubrirCartas(this);
+        manoPanel.descubrirCartas(mano);
     }
 
     /**
@@ -83,10 +87,9 @@ public class Jugador {
             return aportar(pokerView.apostar());
 
         pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
-        
 
         int randomDecision = aleatorio.nextInt(2) + 1;
-        randomDecision = 2;
+
         if (randomDecision == 1) { //apostar
             int nuevaApuesta = aportar(aleatorio.nextInt(dinero / 10) / 100 * 100);
             pokerView.showMessage(nombre + " ha apostado $" + nuevaApuesta, TimeControl.jugadorHaTomadoDecision);
@@ -105,15 +108,15 @@ public class Jugador {
     public int apostar(int valorParaIgualar, boolean ultimaRonda) throws InterruptedException {
 
         if (tipo == TipoJugador.Usuario) {
-            if (ultimaRonda) 
+            if (ultimaRonda)
                 return aportar(pokerView.apostar(valorParaIgualar, true));
-            else 
+            else
                 return aportar(pokerView.apostar(valorParaIgualar, false));
         }
 
         pokerView.showMessage(nombre + " está pensando su apuesta...", TimeControl.jugadorPensadoSuApuesta);
 
-        int randomDecision = ultimaRonda? aleatorio.nextInt(2) + 1 : aleatorio.nextInt(3) + 1;
+        int randomDecision = ultimaRonda ? aleatorio.nextInt(2) + 1 : aleatorio.nextInt(3) + 1;
 
         if (randomDecision == 1) { //igualar
             pokerView.showMessage(nombre + " ha igualado la apuesta", TimeControl.jugadorHaTomadoDecision);
@@ -145,9 +148,38 @@ public class Jugador {
     /**
      * Simula la decision de descartar
      * @return lista de cartas a descartar
+     * @throws InterruptedException
      */
-    public List<Carta> descartar() {
-        return new ArrayList<Carta>();
+    public void descartar() throws InterruptedException {
+        if (tipo == TipoJugador.Usuario) {
+            manoPanel.setRondaDeDescarte();
+            pokerView.descartar();
+            manoPanel.getCartasSeleccionadas()
+        }
+
+        List<Integer> cartas = IntStream.range(0, 5).boxed().collect(Collectors.toList());
+        int cartasADesechar = aleatorio.nextInt(5);
+        int[] cartas2 = new int[cartasADesechar];
+
+        if (cartasADesechar == 0) {
+            pokerView.showMessage(nombre + " continua sin descartar", TimeControl.tiempoDeDescarte);
+            return;
+        }
+
+        for (int i = 0; i < 5 - cartasADesechar; i++)
+            cartas.remove(aleatorio.nextInt(cartas.size()));
+
+        for (int i = 0; i < cartasADesechar; i++)
+            manoPanel.descartar(cartas.get(i));
+
+        pokerView.showMessage(nombre + " ha descartado " + cartasADesechar + " cartas", TimeControl.tiempoDeDescarte);
+
+        for (int i = 0; i < cartasADesechar; i++) {
+            mazo.descartar(mano.remove((int) cartas.get(i)));
+            mano.add(cartas.get(i), mazo.sacarCarta());
+        }
+
+        manoPanel.descubrirCartas(mano); //# TEMPORAL
     }
 
     /**
@@ -158,9 +190,8 @@ public class Jugador {
         return retirado;
     }
 
-
     public void descubrirCartas() {
-        manoPanel.descubrirCartas();
+        manoPanel.descubrirCartas(mano);
     }
 
     // #---------------------------------------------------------------------------
@@ -215,11 +246,11 @@ public class Jugador {
         mano.set(index1, carta2);
         mano.set(index2, carta1);
     }
-}
 
-/**
- * enum que contiene los tipos de jugador (simulado o usuario).
- */
-enum TipoJugador {
-    Simulado, Usuario
+    /**
+    * enum que contiene los tipos de jugador (simulado o usuario).
+    */
+    public enum TipoJugador {
+        Simulado, Usuario
+    }
 }

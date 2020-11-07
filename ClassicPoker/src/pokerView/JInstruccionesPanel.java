@@ -4,7 +4,7 @@
  * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 3: Juego de poker clasico.
  */
-package classicPoker;
+package pokerView;
 
 public class JInstruccionesPanel {
 

@@ -10,6 +10,10 @@ package classicPoker;
  * 
  */
 public class TimeControl {
-    public static final int jugadorPensadoSuApuesta = 1000;
-    public static final int jugadorHaTomadoDecision = 1000;
+    public static final int apuestaInicial = 1000;
+    public static final int rondaDeApuesta = 1000;
+    public static final int jugadorPensadoSuApuesta = 500;
+    public static final int jugadorHaTomadoDecision = 500;
+    public static final int tiempoDeDescarte = 3000;
+
 }

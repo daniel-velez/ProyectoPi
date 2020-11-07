@@ -31,7 +31,7 @@ public class MazoDeCartas {
      * Crea una baraja de cartas organizada.
      */
     public void crearBaraja() {
-        for (Palos palo : Palos.values()) //crear las cartas de cada palo
+        for (Carta.Palos palo : Carta.Palos.values()) //crear las cartas de cada palo
             for (int i = 2; i <= 14; i++)
                 cartas.add(new Carta(i, palo));
     }
@@ -55,6 +55,10 @@ public class MazoDeCartas {
         return mano;
     }
 
+    public Carta sacarCarta() {
+        return cartas.remove(0);
+    }
+
     /**
      * agrega una lista de cartas para descartar al mazoDescarte.
      * @param cartas 
@@ -62,6 +66,14 @@ public class MazoDeCartas {
     public void descartar(List<Carta> cartas) {
         for (Carta carta : cartas)
             mazoDescarte.add(carta);
+    }
+
+    /**
+     * agrega una carta para descartar al mazoDescarte.
+     * @param carta
+     */
+    public void descartar(Carta carta) {
+        mazoDescarte.add(carta);
     }
 
 }

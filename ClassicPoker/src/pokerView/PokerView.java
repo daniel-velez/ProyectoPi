@@ -5,7 +5,9 @@
  * Mini proyecto 3: Juego de poker clasico.
  */
 
-package classicPoker;
+package pokerView;
+
+import classicPoker.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +64,7 @@ public class PokerView extends JFrame {
         this.instrucciones = new JInstruccionesPanel();
 
         for (Jugador jugador : jugadores)
-            if (jugador.getTipo() == TipoJugador.Usuario)
+            if (jugador.getTipo() == Jugador.TipoJugador.Usuario)
                 this.jugador = jugador;
 
         initGUI();
@@ -79,7 +81,7 @@ public class PokerView extends JFrame {
      * Inits the GUI.
      */
     private void initGUI() {
-        this.setLayout(new GridLayout(4, 1)); 
+        this.setLayout(new GridLayout(4, 1));
         JPanel rowPane = new JPanel();
         JPanel colPane = new JPanel();
         fichasPanel = new JPanel();
@@ -227,15 +229,6 @@ public class PokerView extends JFrame {
 
     /**
      * 
-     * @param player
-     */
-    public void descubrirCartas(Jugador player) {
-        // ! condicional sobre el tipo de jugador
-        playersView.get(player).descubrirCartas();
-    }
-
-    /**
-     * 
      * @return
      * @throws InterruptedException
      */
@@ -274,6 +267,15 @@ public class PokerView extends JFrame {
         return apuestaDelJugador;
     }
 
+    public synchronized void descartar() throws InterruptedException {
+        textSmall.setText("Es tu turno");
+
+        descartar.setVisible(true);
+        pasar.setVisible(true);
+
+        wait();
+    }
+
     // #---------------------------------------------------------------------------
     // # Eventos
     // #---------------------------------------------------------------------------
@@ -281,23 +283,17 @@ public class PokerView extends JFrame {
     /**
      * 
      */
-    private synchronized void onApostarClick() {
-        SwingUtilities.invokeLater(new Runnable() {
+    private void onApostarClick() {
 
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
+        apuestaDelJugador = 0;
 
-                apuestaDelJugador = 0;
+        pasar.setVisible(false);
+        apostar.setVisible(false);
+        quitarFichas(false);
+        aumentar.setText("Hacer apuesta");
+        aumentar.setVisible(true);
+        aumentar.setEnabled(false);
 
-                pasar.setVisible(false);
-                apostar.setVisible(false);
-                quitarFichas(false);
-                aumentar.setText("Hacer apuesta");
-                aumentar.setVisible(true);
-                aumentar.setEnabled(false);
-			}
-		});
     }
 
     /**
@@ -306,6 +302,7 @@ public class PokerView extends JFrame {
     private synchronized void onPasarClick() {
         pasar.setVisible(false);
         apostar.setVisible(false);
+        playersView.get(jugador).getCartasSeleccionadas();
         notifyAll();
     }
 
@@ -346,6 +343,13 @@ public class PokerView extends JFrame {
         jugador.retirarse();
         apuestaDelJugador = 0;
         notifyAll();
+    }
+
+    private synchronized void onDescartarClick() {
+        if (playersView.get(jugador).getCartasSeleccionadasSize() > 0)
+            notifyAll();
+        else
+            textSmall.setText("No has seleccionado ninguna carta");
     }
 
     // #---------------------------------------------------------------------------
@@ -442,6 +446,9 @@ public class PokerView extends JFrame {
 
             if (event.getSource() == pasar)
                 onPasarClick();
+
+            if (event.getSource() == descartar)
+                onDescartarClick();
         }
     }
 }

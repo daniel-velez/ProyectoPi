@@ -4,7 +4,9 @@
  * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 3: Juego de poker clasico.
  */
-package classicPoker;
+package pokerView;
+
+import classicPoker.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class JManoPanel extends JPanel {
         this.add(dinero);
 
         for (JButton JCarta : JMano) {
-            if (jugador.getTipo() != TipoJugador.Usuario) {
+            if (jugador.getTipo() != Jugador.TipoJugador.Usuario) {
                 JCarta.setSize(new Dimension(60, 80));
                 JCarta.setMinimumSize(new Dimension(60, 80));
                 JCarta.setPreferredSize(new Dimension(60, 80));
@@ -64,16 +66,17 @@ public class JManoPanel extends JPanel {
         }
     }
 
+    // #---------------------------------------------------------------------------
+    // # MÉTODOS
+    // #---------------------------------------------------------------------------
+
     public void mostrarDinero() {
         dinero.setText(jugador.getDinero().toString());
         revalidate();
         repaint();
     }
 
-    public void descubrirCartas() {
-
-        List<Carta> mano = jugador.getMano();
-
+    public void descubrirCartas(List<Carta> mano) {
         for (int i = 0; i < JMano.size(); i++)
             JMano.get(i).setText(mano.get(i).numero + " " + mano.get(i).palo.toString().charAt(0));
     }
@@ -90,6 +93,10 @@ public class JManoPanel extends JPanel {
             JCarta.setText(null);
     }
 
+    public void descartar(int index) {
+        JMano.get(index).setText(null);
+    }
+
     /**
      * 
      * @return
@@ -98,8 +105,13 @@ public class JManoPanel extends JPanel {
         List<Integer> cartas = new ArrayList<Integer>();
         for (JButton JCarta : cartasSeleccionadas)
             cartas.add(JMano.indexOf(JCarta));
+        cartasSeleccionadas.clear();
         return cartas;
     }
+
+    // #---------------------------------------------------------------------------
+    // # GETTERS & SETTERS
+    // #---------------------------------------------------------------------------
 
     /**
      * 
@@ -115,6 +127,14 @@ public class JManoPanel extends JPanel {
      */
     public JLabel getUserMoney() {
         return dinero;
+    }
+
+    public void setRondaDeDescarte() {
+        ordenarCartas = false;
+    }
+
+    public int getCartasSeleccionadasSize() {
+        return cartasSeleccionadas.size();
     }
 
     // #---------------------------------------------------------------------------
@@ -135,7 +155,7 @@ public class JManoPanel extends JPanel {
                 int index1 = JMano.indexOf(cartasSeleccionadas.get(0));
                 int index2 = JMano.indexOf(JCarta);
                 jugador.cambiarCartas(index1, index2);
-                descubrirCartas();
+                //descubrirCartas();
                 /*
                 int index = JMano.indexOf(cartasSeleccionadas.get(0));
                 JButton boton = JCarta;

@@ -16,8 +16,8 @@ public class Carta {
         this.numero = numero;
         this.palo = palo;
     }
-}
 
-enum Palos {
-    picas, corazones, diamantes, treboles
+    public enum Palos {
+        picas, corazones, diamantes, treboles
+    }
 }
