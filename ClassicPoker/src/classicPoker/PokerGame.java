@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.swing.UIManager;
+
 import java.awt.EventQueue;
 
 /**
@@ -99,9 +101,11 @@ public class PokerGame implements Runnable {
         // selecciona el jugador “mano”
         //Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
 
-        /*do {
+        /*
+        do {
             rondaDeApuesta();
-        } while (!seHanIgualadoTodasLasApuestas());*/
+        } while (!seHanIgualadoTodasLasApuestas());
+        */
         rondaDeDescarte();
         //rondaDeApuesta();
         //descubrirCartas();
@@ -151,8 +155,10 @@ public class PokerGame implements Runnable {
     private void rondaDeDescarte() throws InterruptedException {
         pokerView.showMessage("Empieza la ronda de descarte", 1000);
 
-        for (Jugador jugador : jugadores)
-            jugador.descartar();
+        for (Jugador jugador : jugadores) {
+            if (!jugador.seHaRetirado())
+                jugador.descartar();
+        }
     }
 
     /**
@@ -163,13 +169,7 @@ public class PokerGame implements Runnable {
             jugador.descubrirCartas();
     }
 
-    /**
-     * 
-     * @throws InterruptedException
-     */
-    private void determinarJuego() throws InterruptedException {
-        if (jugadores.size() == 1 && jugadores.get(0).getTipo() == Jugador.TipoJugador.Usuario)
-            pokerView.showBigMessage("Has ganado");
+    private void determinarJuego() {
 
     }
 
@@ -198,7 +198,7 @@ public class PokerGame implements Runnable {
     }
 
     /**
-     * Devuelve una cantidad aleatoria de dinero entre el min y el max
+     * Devuelve una cantidad aleatoria de dinero entre el min y el max.
      */
     private int getRandomMoney() {
         int MAX_MONEY = 70000;
@@ -215,4 +215,20 @@ public class PokerGame implements Runnable {
         mesaDeApuesta.replace(jugador, mesaDeApuesta.get(jugador) + val);
     }
 
+    /**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
+	public static void main(String[] args) {
+
+		try {
+			String className = UIManager.getCrossPlatformLookAndFeelClassName();
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {
+		}
+
+		Thread pokerGame = new Thread(new PokerGame());
+		pokerGame.start();
+	}
 }

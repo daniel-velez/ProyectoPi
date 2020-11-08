@@ -152,9 +152,19 @@ public class Jugador {
      */
     public void descartar() throws InterruptedException {
         if (tipo == TipoJugador.Usuario) {
-            manoPanel.setRondaDeDescarte();
+            manoPanel.setRondaDeDescarte(true);
             pokerView.descartar();
-            manoPanel.getCartasSeleccionadas()
+
+            List <Integer> cartasADescartar = manoPanel.getCartasSeleccionadas();
+            pokerView.showMessage("Has descartado " +  cartasADescartar.size() + " cartas", 0);
+
+            for (int i : cartasADescartar) {
+                mazo.descartar(mano.remove(i));
+                mano.add(i, mazo.sacarCarta());
+            }
+            manoPanel.descubrirCartas(mano); //# TEMPORAL
+            manoPanel.setRondaDeDescarte(false);
+            return;
         }
 
         List<Integer> cartas = IntStream.range(0, 5).boxed().collect(Collectors.toList());
@@ -245,6 +255,8 @@ public class Jugador {
 
         mano.set(index1, carta2);
         mano.set(index2, carta1);
+
+        manoPanel.descubrirCartas(mano);
     }
 
     /**

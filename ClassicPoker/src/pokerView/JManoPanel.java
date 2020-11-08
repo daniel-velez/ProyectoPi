@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,8 +104,10 @@ public class JManoPanel extends JPanel {
      */
     public List<Integer> getCartasSeleccionadas() {
         List<Integer> cartas = new ArrayList<Integer>();
-        for (JButton JCarta : cartasSeleccionadas)
+        for (JButton JCarta : cartasSeleccionadas) {
             cartas.add(JMano.indexOf(JCarta));
+            JCarta.setBackground(null);
+        }
         cartasSeleccionadas.clear();
         return cartas;
     }
@@ -129,8 +132,12 @@ public class JManoPanel extends JPanel {
         return dinero;
     }
 
-    public void setRondaDeDescarte() {
-        ordenarCartas = false;
+    /**
+     * 
+     * @param flag
+     */
+    public void setRondaDeDescarte(boolean flag) {
+        ordenarCartas = !flag;
     }
 
     public int getCartasSeleccionadasSize() {
@@ -148,46 +155,37 @@ public class JManoPanel extends JPanel {
     private void onJCartaClick(JButton JCarta) {
 
         if (ordenarCartas) {
-            if (cartasSeleccionadas.size() == 0)
+            if (cartasSeleccionadas.size() == 0) 
                 cartasSeleccionadas.add(JCarta);
             else if (cartasSeleccionadas.size() == 1) {
-
                 int index1 = JMano.indexOf(cartasSeleccionadas.get(0));
                 int index2 = JMano.indexOf(JCarta);
                 jugador.cambiarCartas(index1, index2);
-                //descubrirCartas();
-                /*
-                int index = JMano.indexOf(cartasSeleccionadas.get(0));
-                JButton boton = JCarta;
-                List <Carta> mano = jugador.getMano();
-                
-                JMano.get(JMano.indexOf(cartasSeleccionadas.get(0))).setText(boton.getText());
-                JCarta.setText(mano.get(index).numero + " " + mano.get(index).palo.toString().charAt(0));
-                */
                 cartasSeleccionadas.clear();
             }
-        } else
+        } 
+        else if (cartasSeleccionadas.indexOf(JCarta) != -1) {
+            cartasSeleccionadas.remove(JCarta);
+            JCarta.setBackground(null);
+        }
+        else {
             cartasSeleccionadas.add(JCarta);
+            JCarta.setBackground(Color.WHITE);
+        }
     }
 
     /**
      * The Class Escucha
      */
     private class Escucha implements ActionListener {
-
         /**
          * Action performed.
          * @param event the event
          */
         @Override
         public void actionPerformed(ActionEvent event) {
-
-            onJCartaClick((JButton) event.getSource());
-            /*
-            for (JButton JCarta : JMano)
-                if (event.getSource() == JCarta)
-                    onJCartaClick(JCarta);
-            */
+            if (!jugador.seHaRetirado())
+                onJCartaClick((JButton) event.getSource());
         }
     }
 }

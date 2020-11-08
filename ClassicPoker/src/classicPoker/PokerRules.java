@@ -171,12 +171,10 @@ public class PokerRules {
         Collections.sort(mano, new Comparator<Carta>() {
             @Override
             public int compare(Carta carta1, Carta carta2) {
-                if (carta1.numero > carta2.numero) {
+                if (carta1.numero > carta2.numero) 
                     return 1;
-                }
-                if (carta1.numero < carta2.numero) {
+                if (carta1.numero < carta2.numero) 
                     return -1;
-                }
                 return 0;
             }
         });

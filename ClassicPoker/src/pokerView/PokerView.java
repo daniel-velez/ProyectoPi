@@ -154,7 +154,7 @@ public class PokerView extends JFrame {
 
         for (JButton ficha : fichas) {
             configurarBoton(ficha, listener);
-            ficha.setVisible(false);
+            ficha.setEnabled(false);
             fichasPanel.add(ficha);
         }
         rowPane.add(fichasPanel, BorderLayout.CENTER);
@@ -173,6 +173,7 @@ public class PokerView extends JFrame {
         opcionesPanel.add(pasar);
         opcionesPanel.add(igualar);
         opcionesPanel.add(aumentar);
+        opcionesPanel.add(descartar);
         opcionesPanel.add(retirarse);
         opcionesPanel.add(levantarse);
         opcionesPanel.add(ayuda);
@@ -180,6 +181,7 @@ public class PokerView extends JFrame {
         igualar.addActionListener(listener);
         aumentar.addActionListener(listener);
         retirarse.addActionListener(listener);
+        descartar.addActionListener(listener);
 
         apostar.addActionListener(listener);
         pasar.addActionListener(listener);
@@ -189,6 +191,7 @@ public class PokerView extends JFrame {
         igualar.setVisible(false);
         aumentar.setVisible(false);
         retirarse.setVisible(false);
+        descartar.setVisible(false);
 
         rowPane.add(opcionesPanel, BorderLayout.LINE_END);
     }
@@ -240,6 +243,7 @@ public class PokerView extends JFrame {
         quitarFichas(true);
         aumentar.setText("Aumentar");
         aumentar.setVisible(false);
+        apostar.setVisible(false);
         return apuestaDelJugador;
     }
 
@@ -274,6 +278,9 @@ public class PokerView extends JFrame {
         pasar.setVisible(true);
 
         wait();
+
+        pasar.setVisible(false);
+        descartar.setVisible(false);
     }
 
     // #---------------------------------------------------------------------------
@@ -293,15 +300,12 @@ public class PokerView extends JFrame {
         aumentar.setText("Hacer apuesta");
         aumentar.setVisible(true);
         aumentar.setEnabled(false);
-
     }
 
     /**
      * 
      */
     private synchronized void onPasarClick() {
-        pasar.setVisible(false);
-        apostar.setVisible(false);
         playersView.get(jugador).getCartasSeleccionadas();
         notifyAll();
     }
@@ -325,15 +329,14 @@ public class PokerView extends JFrame {
     /**
      * 
      * @param ficha
-     * @throws InterruptedException
      */
-    private synchronized void onFichaClick(JButton ficha) throws InterruptedException {
+    private void onFichaClick(JButton ficha) {
         apuestaDelJugador += Integer.parseInt(ficha.getText());
         aumentar.setEnabled(true);
         if (valorParaIgualar == 0)
-            showMessage("Tu apuesta: " + apuestaDelJugador, 0);
+            textSmall.setText("Tu apuesta: " + apuestaDelJugador);
         else
-            showMessage("Tu apuesta: " + valorParaIgualar + " + " + apuestaDelJugador, 0);
+            textSmall.setText("Tu apuesta: " + valorParaIgualar + " + " + apuestaDelJugador);
     }
 
     /**
@@ -397,12 +400,12 @@ public class PokerView extends JFrame {
     }
 
     /**
-     * Hace las fichas visibles o invisibles.
+     * Habilita o deshabilita los botones de las fichas.
      * @param flag
      */
     private void quitarFichas(boolean flag) {
         for (JButton ficha : fichas)
-            ficha.setVisible(!flag);
+            ficha.setEnabled(!flag);
     }
 
     // #---------------------------------------------------------------------------
@@ -424,13 +427,8 @@ public class PokerView extends JFrame {
         public void actionPerformed(ActionEvent event) {
 
             int indexFicha = fichas.indexOf(event.getSource());
-            if (indexFicha != -1) {
-                try {
-                    onFichaClick(fichas.get(indexFicha));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            if (indexFicha != -1)
+                onFichaClick(fichas.get(indexFicha));
 
             if (event.getSource() == igualar)
                 onIgualarClick();
