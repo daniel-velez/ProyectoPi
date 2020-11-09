@@ -38,8 +38,12 @@ public class PokerRules {
 
         int val1 = determinarMano(mano1);
         int val2 = determinarMano(mano2);
-        if (val1 == val2)
-        ;
+        if (val1 > 100 && val2 > 100) { // condición para entrar a evaluar la carta más alta
+            if (val1 == val2)
+            ; //#Pendiente evaluar esta condición.
+            manoGanadora = val1 > val2 ? mano1 : mano2;
+            return manoGanadora;   
+        }
 
         manoGanadora = determinarMano(mano1) < determinarMano(mano2) ? mano1 : mano2;
         return manoGanadora;
@@ -94,6 +98,12 @@ public class PokerRules {
             return valorMano;
         }
 
+        if (pareja(mano)) {
+            valorMano = 9;
+            return valorMano;
+        }
+
+        valorMano = cartaMasAlta(mano) + 100; // 
         return valorMano;
     }
 

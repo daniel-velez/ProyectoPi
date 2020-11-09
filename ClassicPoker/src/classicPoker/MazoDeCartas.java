@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import classicPoker.Carta.Palos;
+
 /**
  * Clase que modela un mazo de cartas.
  */
@@ -75,5 +77,17 @@ public class MazoDeCartas {
     public void descartar(Carta carta) {
         mazoDescarte.add(carta);
     }
+
+
+
+    public static List<Carta> manoColor(Palos palo) {
+        List<Carta> mano = new ArrayList<Carta>();
+
+        for (int i = 0; i < 5; i++)
+            mano.add(new Carta(i, palo));
+        return mano;
+    }
+
+    
 
 }
