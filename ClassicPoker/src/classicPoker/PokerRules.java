@@ -26,6 +26,7 @@ public class PokerRules {
     private static pokerRule[] hh = { (x) -> 2 * x, (x) -> 5 * x };
 
     //! hay que verificar que la mano sea de 5 cartas? o lo damos por hecho
+    //! Considero que lo podemos dar por hecho.
 
     /**
      * 
@@ -35,6 +36,11 @@ public class PokerRules {
     public static List<Carta> determinarMano(List<Carta> mano1, List<Carta> mano2) {
         List<Carta> manoGanadora;
 
+        int val1 = determinarMano(mano1);
+        int val2 = determinarMano(mano2);
+        if (val1 == val2)
+        ;
+
         manoGanadora = determinarMano(mano1) < determinarMano(mano2) ? mano1 : mano2;
         return manoGanadora;
     }
@@ -42,14 +48,51 @@ public class PokerRules {
     /**
      * Determina si la mano especificada corresponde a la de una jugada.
      * @param mano lista de cartas
-     * @return 1 = Escalera real
+     * @return el valor correspondiente de la mano.
      */
     public static int determinarMano(List<Carta> mano) {
         ordenarMano(mano);
-        int valorMano = 11;
+        int valorMano = 11; //en caso de que la mano no corresponda a ninguna jugada.
 
-        if (escaleraReal(mano)) 
+        if (escaleraReal(mano)) {
             valorMano = 1;
+            return valorMano;
+        }
+
+        if (poker(mano)) {
+            valorMano = 2;
+            return valorMano;
+        }
+
+        if (escaleraColor(mano)) {
+            valorMano = 3;
+            return valorMano;
+        }
+        
+        if (full(mano)) {
+            valorMano = 4;
+            return valorMano;
+        }            
+
+        if (color(mano)) {
+            valorMano = 5;
+            return valorMano;
+        }
+        
+        if (escalera(mano)) {
+            valorMano = 6;
+            return valorMano;
+        }
+
+        if (trio(mano)) {
+            valorMano = 7;
+            return valorMano;
+        }
+
+        if (doblePareja(mano)) {
+            valorMano = 8;
+            return valorMano;
+        }
 
         return valorMano;
     }
@@ -67,6 +110,11 @@ public class PokerRules {
         return true;
     }
 
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean poker(List<Carta> mano) {
         Map<Carta, Integer> conteo = conteoDeCartas(mano);
         for (Integer n : conteo.values())
@@ -76,6 +124,11 @@ public class PokerRules {
     }
 
     //! falta la condicion para el AS
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean escaleraColor(List<Carta> mano) {
         if (!color(mano))
             return false;
@@ -85,6 +138,11 @@ public class PokerRules {
         return true;
     }
 
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean full(List<Carta> mano) {
         Map<Carta, Integer> conteo = conteoDeCartas(mano);
         for (Integer n : conteo.values())
@@ -105,6 +163,11 @@ public class PokerRules {
     }
 
     //! falta la condicion para el AS
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean escalera(List<Carta> mano) {
         for (int i = 0; i < 5; i++)
             if (mano.get(i).numero != i + mano.get(0).numero)
@@ -112,6 +175,11 @@ public class PokerRules {
         return true;
     }
 
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean trio(List<Carta> mano) {
         Map<Carta, Integer> conteo = conteoDeCartas(mano);
         for (Integer n : conteo.values())
@@ -120,6 +188,11 @@ public class PokerRules {
         return false;
     }
 
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean doblePareja(List<Carta> mano) {
         Map<Carta, Integer> conteo = conteoDeCartas(mano);
         int parejas = 0;
@@ -132,6 +205,11 @@ public class PokerRules {
         return false;
     }
 
+    /**
+     * 
+     * @param mano
+     * @return
+     */
     private static boolean pareja(List<Carta> mano) {
         Map<Carta, Integer> conteo = conteoDeCartas(mano);
         for (Integer n : conteo.values())
@@ -140,7 +218,12 @@ public class PokerRules {
         return false;
     }
 
-    private static int cartaMásAlta(List<Carta> mano) {
+    /**
+     * 
+     * @param mano
+     * @return
+     */
+    private static int cartaMasAlta(List<Carta> mano) {
         int max = 0;
         for (Carta carta : mano)
             if (carta.numero > max)
@@ -167,7 +250,6 @@ public class PokerRules {
      * @param mano lista de cartas para ordenar.
      */
     public static void ordenarMano(List<Carta> mano) {
-        //mano.sort(Comparator.comparing(numero));
         Collections.sort(mano, new Comparator<Carta>() {
             @Override
             public int compare(Carta carta1, Carta carta2) {

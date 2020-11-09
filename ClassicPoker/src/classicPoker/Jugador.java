@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.management.timer.TimerNotification;
 import javax.swing.JButton;
 
 /**
@@ -156,7 +157,10 @@ public class Jugador {
             pokerView.descartar();
 
             List <Integer> cartasADescartar = manoPanel.getCartasSeleccionadas();
-            pokerView.showMessage("Has descartado " +  cartasADescartar.size() + " cartas", 0);
+            for (Integer i : cartasADescartar) {
+                manoPanel.descartar(i);
+            }
+            pokerView.showMessage("Has descartado " +  cartasADescartar.size() + " cartas", TimeControl.tiempoDeDescarte);
 
             for (int i : cartasADescartar) {
                 mazo.descartar(mano.remove(i));
@@ -202,6 +206,11 @@ public class Jugador {
 
     public void descubrirCartas() {
         manoPanel.descubrirCartas(mano);
+    }
+
+    public void recibirDinero(int dinero) {
+        this.dinero += dinero;
+        pokerView.updateMoney(this);
     }
 
     // #---------------------------------------------------------------------------

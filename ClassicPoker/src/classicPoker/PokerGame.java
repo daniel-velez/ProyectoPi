@@ -15,8 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.swing.UIManager;
+
+import classicPoker.Jugador.TipoJugador;
 
 import java.awt.EventQueue;
 
@@ -30,7 +33,7 @@ public class PokerGame implements Runnable {
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
     private int apuestaInicial;
-    //private int apuestaMasAlta;
+    // private int apuestaMasAlta;
     private int numeroRonda = 0;
     private PokerView pokerView;
 
@@ -84,7 +87,7 @@ public class PokerGame implements Runnable {
      * @throws InterruptedException
      */
     private void iniciarRonda() throws InterruptedException {
-        //pokerView.iniciarRonda(); //# TEMPORAL
+        // pokerView.iniciarRonda(); //# TEMPORAL
 
         // hacer la apuesta inicial
         for (Jugador jugador : jugadores)
@@ -92,24 +95,26 @@ public class PokerGame implements Runnable {
 
         pokerView.showBigMessage("Monto de la apuesta: " + getMontoApuestas());
         pokerView.showMessage("Apuesta inicial: $" + apuestaInicial, TimeControl.apuestaInicial);
-        //pokerView.showMessage("Cada jugador ha hecho su apuesta inicial", 2000);
+        // pokerView.showMessage("Cada jugador ha hecho su apuesta inicial", 2000);
 
         repartirCartas();
 
-        //! voy a comentar shuffle para que el orden de los turnos siempre sea el mismo, 
-        //! mientras hacemos las pruebas
+        // ! voy a comentar shuffle para que el orden de los turnos siempre sea el
+        // mismo,
+        // ! mientras hacemos las pruebas
         // selecciona el jugador “mano”
-        //Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a la derecha
+        // Collections.shuffle(jugadores); // ! no se tiene en cuenta lo del jugador a
+        // la derecha
 
         /*
-        do {
-            rondaDeApuesta();
-        } while (!seHanIgualadoTodasLasApuestas());
-        */
+         * do { rondaDeApuesta(); } while (!seHanIgualadoTodasLasApuestas());
+         */
         rondaDeDescarte();
-        //rondaDeApuesta();
-        //descubrirCartas();
-        //determinarJuego();
+        /*
+         * do { rondaDeApuesta(); } while (!seHanIgualadoTodasLasApuestas());
+         */
+        descubrirCartas();
+        determinarJuego();
     }
 
     /**
@@ -169,8 +174,52 @@ public class PokerGame implements Runnable {
             jugador.descubrirCartas();
     }
 
-    private void determinarJuego() {
+    private void determinarJuego() throws InterruptedException {
+        List <Jugador> enJuego = new ArrayList<Jugador>();
+        for (Jugador jugador : jugadores) {
+            if (!jugador.seHaRetirado()) 
+                enJuego.add(jugador);
+        }
 
+        Jugador ganador = null;
+        List <Carta> manoAuxiliar = new ArrayList<Carta>();
+
+        for (int i = 1; i<enJuego.size(); i++) {
+            if (i == 1) 
+                manoAuxiliar = PokerRules.determinarMano(enJuego.get(0).getMano(), enJuego.get(i).getMano());
+            else 
+                manoAuxiliar = PokerRules.determinarMano(ganador.getMano(), enJuego.get(i).getMano());
+            ganador = buscarJugador(enJuego, manoAuxiliar);
+        }
+
+        int dineroARecibir = getMontoApuestas();
+        if (ganador.getTipo() == TipoJugador.Simulado) {
+            pokerView.showBigMessage("¡El jugador " + ganador.getName() + " ha ganado!");
+            pokerView.showMessage("recibe " + dineroARecibir, 0);
+        }
+        else {
+            pokerView.showBigMessage("¡Has ganado!");
+            pokerView.showMessage("Recibes " + dineroARecibir, 0);
+        }
+        ganador.recibirDinero(dineroARecibir);
+            
+        for (Jugador p : jugadores) {
+            mesaDeApuesta.replace(p, 0);
+        }    
+    }
+
+    /**
+     * 
+     * @param jugadores
+     * @param mano
+     * @return jugador al que le pertenece la mano especificada.
+     */
+    private Jugador buscarJugador(List<Jugador> jugadores, List<Carta> mano) {
+        for (Jugador jugador : jugadores) {
+            if (jugador.getMano() == mano)
+                return jugador;
+        }
+        return null;
     }
 
     /**

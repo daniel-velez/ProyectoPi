@@ -54,9 +54,9 @@ public class JManoPanel extends JPanel {
 
         for (JButton JCarta : JMano) {
             if (jugador.getTipo() != Jugador.TipoJugador.Usuario) {
-                JCarta.setSize(new Dimension(60, 80));
-                JCarta.setMinimumSize(new Dimension(60, 80));
-                JCarta.setPreferredSize(new Dimension(60, 80));
+                JCarta.setSize(new Dimension(70, 80));
+                JCarta.setMinimumSize(new Dimension(70, 80));
+                JCarta.setPreferredSize(new Dimension(70, 80));
             } else {
                 JCarta.setSize(new Dimension(100, 120));
                 JCarta.setMinimumSize(new Dimension(100, 120));
