@@ -140,12 +140,49 @@ public class PokerRules {
      * @return
      */
     private static boolean escaleraColor(List<Carta> mano) {
+        boolean flag = true;
+
         if (!color(mano))
             return false;
-        for (int i = 0; i < 5; i++)
-            if (mano.get(i).numero != i + mano.get(0).numero)
+
+        for (int i = 0; i < 5; i++) {
+            if (mano.get(i).numero != i + mano.get(0).numero) {
+                flag = false;
+                break;
+            }
+        }
+
+        if (flag) // La mano es una escalera color
+            return flag;
+
+        //# Condición para el AS.
+
+        flag = true;
+        //# Primer opcion -> K, A, 2, 3, 4 
+        for (int j = 0; j < mano.size(); j++) {
+            if (mano.get(1).numero != mano.get(0).numero + 1) {
+                flag =  false;
+                break;
+            }
+            else if (j >= 2) {
+                if (mano.get(j).numero != (j-2) + mano.get(2).numero) {
+                    flag = false;
+                    break;
+                }
+            }
+        }
+
+        if (flag) // La mano es una escalera color formada con As, Rey y 2.
+            return flag;
+
+        //# Segunda opcion -> J, Q, K, A, 2
+        for (int k = 0; k < 5; k++) {
+            if (mano.get(k).numero != k + mano.get(0).numero && k<4) 
                 return false;
-        return true;
+            else if (mano.get(k).numero != 2) 
+                return false;
+        }
+        return true; // La mano es una escalera color formada con As, Rey y 2.
     }
 
     /**

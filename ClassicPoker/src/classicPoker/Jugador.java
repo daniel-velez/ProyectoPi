@@ -77,6 +77,12 @@ public class Jugador {
         manoPanel.descubrirCartas(mano);
     }
 
+    public void recibirMano(List<Carta> cartas) {
+        this.mano.clear();
+        this.mano = cartas;
+        manoPanel.descubrirCartas(mano);
+    }
+
     /**
      * 
      * @param ultimaRonda
@@ -160,7 +166,8 @@ public class Jugador {
             for (Integer i : cartasADescartar) {
                 manoPanel.descartar(i);
             }
-            pokerView.showMessage("Has descartado " +  cartasADescartar.size() + " cartas", TimeControl.tiempoDeDescarte);
+            String cantidad = cartasADescartar.size() == 1 ? " carta" : " cartas";
+            pokerView.showMessage("Has descartado " +  cartasADescartar.size() + cantidad, TimeControl.tiempoDeDescarte);
 
             for (int i : cartasADescartar) {
                 mazo.descartar(mano.remove(i));

@@ -46,7 +46,7 @@ public class MazoDeCartas {
     }
 
     /**
-     * retorna una lista de n cartas.
+     * Retorna una lista de n cartas.
      * @param n
      */
     //! qué pasa si se intentan sacar 0 cartas?
@@ -57,12 +57,16 @@ public class MazoDeCartas {
         return mano;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Carta sacarCarta() {
         return cartas.remove(0);
     }
 
     /**
-     * agrega una lista de cartas para descartar al mazoDescarte.
+     * Agrega una lista de cartas para descartar al mazoDescarte.
      * @param cartas 
      */
     public void descartar(List<Carta> cartas) {
@@ -71,7 +75,7 @@ public class MazoDeCartas {
     }
 
     /**
-     * agrega una carta para descartar al mazoDescarte.
+     * Agrega una carta para descartar al mazoDescarte.
      * @param carta
      */
     public void descartar(Carta carta) {
@@ -79,15 +83,35 @@ public class MazoDeCartas {
     }
 
 
+    //# Metodos para obtener una mano con jugada.
 
+    /**
+     * 
+     * @param palo
+     * @return la mano con la jugada color.
+     */
     public static List<Carta> manoColor(Palos palo) {
         List<Carta> mano = new ArrayList<Carta>();
 
+        // 3, 4, 5, 6, 7.
         for (int i = 0; i < 5; i++)
-            mano.add(new Carta(i, palo));
+            mano.add(new Carta(i+3, palo));
         return mano;
     }
 
-    
+    /**
+     * 
+     * @param palo
+     * @return la mano con la jugada escalera color.
+     */
+    public static List<Carta> manoEscaleraColor(Palos palo) {
+        List<Carta> mano = new ArrayList<Carta>();
+
+        // 2, 3, 4, 5, 6.
+        for (int j = 0; j < 5; j++) 
+            mano.add(new Carta(2+j, palo));
+
+        return mano;
+    }
 
 }

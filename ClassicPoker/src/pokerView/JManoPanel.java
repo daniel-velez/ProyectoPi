@@ -94,6 +94,10 @@ public class JManoPanel extends JPanel {
             JCarta.setText(null);
     }
 
+    /**
+     * 
+     * @param index
+     */
     public void descartar(int index) {
         JMano.get(index).setText(null);
     }
@@ -117,29 +121,30 @@ public class JManoPanel extends JPanel {
     // #---------------------------------------------------------------------------
 
     /**
-     * 
-     * @return
+     * @return El JLabel con el nombre del jugador.
      */
     public JLabel getUserName() {
         return nombre;
     }
 
     /**
-     * 
-     * @return
+     * @return El JLabel con el dinero del jugador.
      */
     public JLabel getUserMoney() {
         return dinero;
     }
 
     /**
-     * 
-     * @param flag
+     * Establece el atributo ordenarCartas en false en caso de estar en la ronda de descarte.
+     * @param flag true si está en la ronda de descarte, false en caso contrario.
      */
     public void setRondaDeDescarte(boolean flag) {
         ordenarCartas = !flag;
     }
 
+    /**
+     * @return 
+     */
     public int getCartasSeleccionadasSize() {
         return cartasSeleccionadas.size();
     }

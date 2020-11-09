@@ -391,7 +391,7 @@ public class PokerView extends JFrame {
     /**
      * Configura un boton y le adiciona un escucha.
      * @param boton   el boton a configurar
-     * @param escucha el escucha de lso eventos
+     * @param escucha el escucha de los eventos
      */
     private void configurarBoton(JButton boton, Escucha escucha) {
         // boton.setBorder(null);

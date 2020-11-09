@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.swing.UIManager;
 
+import classicPoker.Carta.Palos;
 import classicPoker.Jugador.TipoJugador;
 
 import java.awt.EventQueue;
@@ -107,12 +108,16 @@ public class PokerGame implements Runnable {
         // la derecha
 
         /*
-         * do { rondaDeApuesta(); } while (!seHanIgualadoTodasLasApuestas());
-         */
+        do {
+            rondaDeApuesta();
+        } while (!seHanIgualadoTodasLasApuestas());
+        */
         rondaDeDescarte();
         /*
-         * do { rondaDeApuesta(); } while (!seHanIgualadoTodasLasApuestas());
-         */
+        do {
+            rondaDeApuesta();
+        } while (!seHanIgualadoTodasLasApuestas());
+        */
         descubrirCartas();
         determinarJuego();
     }
@@ -123,6 +128,9 @@ public class PokerGame implements Runnable {
     private void repartirCartas() {
         for (Jugador jugador : jugadores)
             jugador.recibirCartas(mazo.sacarCartas(5));
+
+        //jugadores.get(4).recibirMano(MazoDeCartas.manoEscaleraColor(Palos.corazones));
+        //jugadores.get(3).recibirMano(MazoDeCartas.manoColor(Palos.diamantes));
     }
 
     /**
@@ -164,6 +172,7 @@ public class PokerGame implements Runnable {
             if (!jugador.seHaRetirado())
                 jugador.descartar();
         }
+        numeroRonda = 0;
     }
 
     /**
@@ -176,13 +185,13 @@ public class PokerGame implements Runnable {
 
     private void determinarJuego() throws InterruptedException {
         List <Jugador> enJuego = new ArrayList<Jugador>();
+        List <Carta> manoAuxiliar = new ArrayList<Carta>();
+        Jugador ganador = null;
+
         for (Jugador jugador : jugadores) {
             if (!jugador.seHaRetirado()) 
                 enJuego.add(jugador);
         }
-
-        Jugador ganador = null;
-        List <Carta> manoAuxiliar = new ArrayList<Carta>();
 
         for (int i = 1; i<enJuego.size(); i++) {
             if (i == 1) 
@@ -201,18 +210,17 @@ public class PokerGame implements Runnable {
             pokerView.showBigMessage("¡Has ganado!");
             pokerView.showMessage("Recibes " + dineroARecibir, 0);
         }
-        ganador.recibirDinero(dineroARecibir);
+        ganador.recibirDinero(dineroARecibir); 
             
-        for (Jugador p : jugadores) {
-            mesaDeApuesta.replace(p, 0);
-        }    
+        for (Jugador p : jugadores) 
+            mesaDeApuesta.replace(p, 0); //# ¿Qué pasa con el dinero de los que se retiran?.
     }
 
     /**
-     * 
+     * Busca en una lista de jugadores el jugador al cual le pertenece una mano dada.
      * @param jugadores
      * @param mano
-     * @return jugador al que le pertenece la mano especificada.
+     * @return jugador al que le pertenece la mano especificada, null si se encuentra.
      */
     private Jugador buscarJugador(List<Jugador> jugadores, List<Carta> mano) {
         for (Jugador jugador : jugadores) {
@@ -278,6 +286,6 @@ public class PokerGame implements Runnable {
 		}
 
 		Thread pokerGame = new Thread(new PokerGame());
-		pokerGame.start();
+        pokerGame.start();
 	}
 }
