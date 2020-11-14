@@ -4,10 +4,10 @@
  * Autor: Daniel Felipe Velez Cuaical - 1924306
  * Mini proyecto 3: Juego de poker clasico.
  */
-
 package classicPoker;
 
 import pokerView.*;
+import classicPoker.Jugador.TipoJugador;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,13 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import javax.swing.UIManager;
-
-import classicPoker.Carta.Palos;
-import classicPoker.Jugador.TipoJugador;
-
 import java.awt.EventQueue;
 
 /**
@@ -34,7 +29,6 @@ public class PokerGame implements Runnable {
     private int turno; // de tipo int o Jugador <- pendiente.
     private List<Jugador> jugadores;
     private int apuestaInicial;
-    // private int apuestaMasAlta;
     private int numeroRonda = 0;
     private PokerView pokerView;
 
@@ -84,7 +78,7 @@ public class PokerGame implements Runnable {
     }
 
     /**
-     * 
+     * Empieza la ronda de juego.
      * @throws InterruptedException
      */
     private void iniciarRonda() throws InterruptedException {
@@ -126,11 +120,19 @@ public class PokerGame implements Runnable {
      * 
      */
     private void repartirCartas() {
+        //Para pruebas.
+
+        //jugadores.get(4).recibirCartas(mazo.manoEscaleraReal(Palos.corazones));
+        //jugadores.get(3).recibirCartas(mazo.manoEscaleraReal(Palos.diamantes));
+
+        //for (int i = 0; i < jugadores.size()-2; i++) 
+        //    jugadores.get(i).recibirCartas(mazo.sacarCartas(5));
+
+        // Por defecto.
+        
         for (Jugador jugador : jugadores)
             jugador.recibirCartas(mazo.sacarCartas(5));
-
-        //jugadores.get(4).recibirMano(MazoDeCartas.manoEscaleraColor(Palos.corazones));
-        //jugadores.get(3).recibirMano(MazoDeCartas.manoColor(Palos.diamantes));
+                
     }
 
     /**
@@ -152,7 +154,7 @@ public class PokerGame implements Runnable {
                 continue;
 
             if (apuestaMasAlta == apuestaInicial)
-                mesaDeApuestaUpdate(jugador, jugador.apostar(ultimaRonda));
+                mesaDeApuestaUpdate(jugador, jugador.apostar());
             else
                 mesaDeApuestaUpdate(jugador, jugador.apostar(apuestaMasAlta - mesaDeApuesta.get(jugador), ultimaRonda));
 
@@ -168,6 +170,15 @@ public class PokerGame implements Runnable {
     private void rondaDeDescarte() throws InterruptedException {
         pokerView.showMessage("Empieza la ronda de descarte", 1000);
 
+        // Para pruebas.
+        /*
+        for (Jugador jugador : jugadores) {
+            if (!jugador.seHaRetirado() && jugador.getName() != "P4")
+                jugador.descartar();
+        }
+        */
+
+        // Por defecto
         for (Jugador jugador : jugadores) {
             if (!jugador.seHaRetirado())
                 jugador.descartar();
@@ -183,51 +194,85 @@ public class PokerGame implements Runnable {
             jugador.descubrirCartas();
     }
 
+    /**
+     * 
+     * @throws InterruptedException
+     */
     private void determinarJuego() throws InterruptedException {
-        List <Jugador> enJuego = new ArrayList<Jugador>();
-        List <Carta> manoAuxiliar = new ArrayList<Carta>();
-        Jugador ganador = null;
+        //Map <Jugador, Integer> valores = new HashMap<Jugador, Integer>();
+        List <Jugador> ganadores = new ArrayList<Jugador>();
 
+        //# Determinar ganador/ganadores
+        //int valorGanador = 100;
+        /*
         for (Jugador jugador : jugadores) {
-            if (!jugador.seHaRetirado()) 
-                enJuego.add(jugador);
+            if (!jugador.seHaRetirado())
+                valores.put(jugador, PokerRules.determinarMano(jugador.getMano()));
+            if (valores.get(jugador) < valorGanador)
+                valorGanador = valores.get(jugador);
         }
-
-        for (int i = 1; i<enJuego.size(); i++) {
-            if (i == 1) 
-                manoAuxiliar = PokerRules.determinarMano(enJuego.get(0).getMano(), enJuego.get(i).getMano());
+        */
+        Jugador auxiliar;
+        for (int i = 0; i < jugadores.size()-1; i++) {
+            if (i == 0) 
+                auxiliar = PokerRules.determinarMano(jugadores.get(0), jugadores.get(1));
+            
             else 
-                manoAuxiliar = PokerRules.determinarMano(ganador.getMano(), enJuego.get(i).getMano());
-            ganador = buscarJugador(enJuego, manoAuxiliar);
+                auxiliar = PokerRules.determinarMano(ganadores.get(ganadores.size()-1), jugadores.get(i+1));
+
+            if (auxiliar != null) { // Posible único ganador.
+                ganadores.add(auxiliar);
+                if (ganadores.size() > 1) { // eliminar los posibles ganadores anteriores.
+                    for (int j = ganadores.size()-2; j >= 0; j--) 
+                        ganadores.remove(j);
+                }
+            }
+            else if (auxiliar == null) { // empate, se agregan los dos jugadores a la lista de ganadores.
+                if (i == 0) {
+                    ganadores.add(jugadores.get(0));
+                    ganadores.add(jugadores.get(1));
+                }
+                else 
+                    ganadores.add(jugadores.get(i+1)); 
+            }
         }
 
+        /*
+        List <Jugador> ganadores = new ArrayList<Jugador>(valores.keySet());
+        for (Jugador jugador : valores.keySet()) {
+            if (valores.get(jugador) != valorGanador) 
+                ganadores.remove(jugador);
+        }
+        */
+
+        //# Repartir el premio
         int dineroARecibir = getMontoApuestas();
-        if (ganador.getTipo() == TipoJugador.Simulado) {
-            pokerView.showBigMessage("¡El jugador " + ganador.getName() + " ha ganado!");
-            pokerView.showMessage("recibe " + dineroARecibir, 0);
+
+        if (ganadores.size() == 1) {
+            if (ganadores.get(0).getTipo() == TipoJugador.Simulado) {
+                pokerView.showBigMessage("¡El jugador " + ganadores.get(0).getName() + " ha ganado!");
+                pokerView.showMessage("recibe " + dineroARecibir, 0);
+            }
+            else {
+                pokerView.showBigMessage("¡Has ganado!");
+                pokerView.showMessage("Recibes " + dineroARecibir, 0);
+            }
+            ganadores.get(0).recibirDinero(dineroARecibir); 
         }
         else {
-            pokerView.showBigMessage("¡Has ganado!");
-            pokerView.showMessage("Recibes " + dineroARecibir, 0);
+            String nombres = "";
+            dineroARecibir /= ganadores.size();
+
+            for (Jugador jugador : ganadores) {
+                jugador.recibirDinero(dineroARecibir);
+                nombres += jugador.getName() + " ";
+            }
+            pokerView.showBigMessage("Los jugadores " + nombres + "han ganado!");
+            pokerView.showMessage("Recibe " + dineroARecibir + " cada uno", 0);
         }
-        ganador.recibirDinero(dineroARecibir); 
             
         for (Jugador p : jugadores) 
-            mesaDeApuesta.replace(p, 0); //# ¿Qué pasa con el dinero de los que se retiran?.
-    }
-
-    /**
-     * Busca en una lista de jugadores el jugador al cual le pertenece una mano dada.
-     * @param jugadores
-     * @param mano
-     * @return jugador al que le pertenece la mano especificada, null si se encuentra.
-     */
-    private Jugador buscarJugador(List<Jugador> jugadores, List<Carta> mano) {
-        for (Jugador jugador : jugadores) {
-            if (jugador.getMano() == mano)
-                return jugador;
-        }
-        return null;
+            mesaDeApuesta.replace(p, 0); 
     }
 
     /**
@@ -245,6 +290,10 @@ public class PokerGame implements Runnable {
     // # FUNCIONES AUXILIARES
     // #---------------------------------------------------------------------------
 
+    /**
+     * Determinar si todas las apuestan son iguales.
+     * @return true si se han igualado las apuestas, false en caso contrario.
+     */
     private boolean seHanIgualadoTodasLasApuestas() {
         int apuestaMasAlta = Collections.max(mesaDeApuesta.values());
         for (Jugador jugador : jugadores)
@@ -255,7 +304,20 @@ public class PokerGame implements Runnable {
     }
 
     /**
-     * Devuelve una cantidad aleatoria de dinero entre el min y el max.
+     * Determinar si queda un jugador en juego.
+     * @return true si 4 de los jugadores se han retirado.
+     */
+    private boolean quedaUnJugador() {
+        int contador = 0;
+        for (Jugador jugador : jugadores) {
+            if (jugador.seHaRetirado())
+                contador++;
+        }
+        return contador == 4 ? true : false;
+    }
+
+    /**
+     * @return Una cantidad aleatoria de dinero entre el min y el max.
      */
     private int getRandomMoney() {
         int MAX_MONEY = 70000;
@@ -265,8 +327,8 @@ public class PokerGame implements Runnable {
 
     /**
     * Actualiza el valor de la apuesta de un jugador en la mesaDeApuesta
-    * @param jugador
-    * @param val
+    * @param jugador jugador que hace la apuesta.
+    * @param val valor de la apuesta.
     */
     private void mesaDeApuestaUpdate(Jugador jugador, int val) {
         mesaDeApuesta.replace(jugador, mesaDeApuesta.get(jugador) + val);
@@ -279,7 +341,8 @@ public class PokerGame implements Runnable {
 	 */
 	public static void main(String[] args) {
 
-		try {
+		
+        try {
 			String className = UIManager.getCrossPlatformLookAndFeelClassName();
 			UIManager.setLookAndFeel(className);
 		} catch (Exception e) {

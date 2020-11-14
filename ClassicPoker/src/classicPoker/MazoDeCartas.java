@@ -58,8 +58,8 @@ public class MazoDeCartas {
     }
 
     /**
-     * 
-     * @return
+     * Elimina la carta en la posicion 0 de la lista de cartas.
+     * @return La carta que se ha eliminado de la lista de cartas.
      */
     public Carta sacarCarta() {
         return cartas.remove(0);
@@ -70,8 +70,7 @@ public class MazoDeCartas {
      * @param cartas 
      */
     public void descartar(List<Carta> cartas) {
-        for (Carta carta : cartas)
-            mazoDescarte.add(carta);
+        mazoDescarte.addAll(cartas);
     }
 
     /**
@@ -86,32 +85,50 @@ public class MazoDeCartas {
     //# Metodos para obtener una mano con jugada.
 
     /**
-     * 
-     * @param palo
-     * @return la mano con la jugada color.
+     * Crea y retorna una lista de cartas con la jugada Escalera Real del palo especificado.
+     * @param palo 
+     * @return La mano con la jugada Escalera Real.
      */
-    public static List<Carta> manoColor(Palos palo) {
+    public List<Carta> manoEscaleraReal(Palos palo) {
         List<Carta> mano = new ArrayList<Carta>();
 
-        // 3, 4, 5, 6, 7.
-        for (int i = 0; i < 5; i++)
-            mano.add(new Carta(i+3, palo));
+        // 10, J, Q, K, A.
+        for (int i = 0; i < 5; i++) {
+            mano.add(new Carta(i+10, palo));
+            eliminarCarta(mano.get(i));
+        }
         return mano;
     }
 
     /**
-     * 
+     * Crea y retorna una lista de cartas con la jugada Escalera Color del palo especificado.
      * @param palo
-     * @return la mano con la jugada escalera color.
+     * @return La mano con la jugada Escalera Color.
      */
-    public static List<Carta> manoEscaleraColor(Palos palo) {
+    public List<Carta> manoEscaleraColor(Palos palo) {
         List<Carta> mano = new ArrayList<Carta>();
 
         // 2, 3, 4, 5, 6.
-        for (int j = 0; j < 5; j++) 
-            mano.add(new Carta(2+j, palo));
-
+        for (int i = 0; i < 5; i++) {
+            mano.add(new Carta(2+i, palo));
+            eliminarCarta(mano.get(i));
+        }
         return mano;
+    }
+
+    /**
+     * Elimina una carta especificada de la lista de cartas.
+     * @param unaCarta
+     * @return true si se ha encontrado y eliminado la carta especificada, false en caso contrario.
+     */
+    private boolean eliminarCarta(Carta unaCarta) {
+        for (Carta carta : cartas) {
+            if (carta.numero == unaCarta.numero && carta.palo == unaCarta.palo) {
+                cartas.remove(carta);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -6,13 +6,12 @@
  */
 package classicPoker;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.lang.model.util.ElementScanner6;
 
 /**
  * Clase que determina una mano de poker.
@@ -20,130 +19,181 @@ import javax.lang.model.util.ElementScanner6;
 public class PokerRules {
 
     private interface pokerRule {
-        public int f(int x);
+        public List<Integer> comprobarMano(List<Carta> mano, Map<Integer, Integer> conteo);
     }
 
-    private static pokerRule[] hh = { (x) -> 2 * x, (x) -> 5 * x };
-
-    //! hay que verificar que la mano sea de 5 cartas? o lo damos por hecho
-    //! Considero que lo podemos dar por hecho.
+    private static pokerRule[] jugadas = {
+        (mano, conteo) -> escaleraReal(mano),
+        (mano, conteo) -> poker(mano, conteo),
+        (mano, conteo) -> escaleraColor(mano),
+        (mano, conteo) -> full(mano, conteo),
+        (mano, conteo) -> color(mano),
+        (mano, conteo) -> escalera(mano),
+        (mano, conteo) -> trio(mano, conteo),
+        (mano, conteo) -> doblePareja(mano, conteo),
+        (mano, conteo) -> pareja(mano, conteo)
+    };
 
     /**
      * 
      * @param mano1
      * @param mano2
      */
-    public static List<Carta> determinarMano(List<Carta> mano1, List<Carta> mano2) {
-        List<Carta> manoGanadora;
+    public static Jugador determinarMano(Jugador jugador1, Jugador jugador2) {
+        List <Carta> mano1 = jugador1.getMano();
+        List <Carta> mano2 = jugador2.getMano();
 
+        Pair <Integer, List<Integer>> resultado1 = determinarMano(mano1);
+        Pair <Integer, List<Integer>> resultado2 = determinarMano(mano2);
+
+        int valorJugada1 = resultado1.getFirst();
+        int valorJugada2 = resultado2.getFirst();
+
+        if (valorJugada1 == valorJugada2) { // Condicion para el posible desempate.
+            // Se obtiene el valor de la carta mas alta que compone la jugada de cada jugador.
+            int valorCartaMayor1 = cartaMasAlta(resultado1.getSecond());
+            int valorCartaMayor2 = cartaMasAlta(resultado2.getSecond());
+
+            if (valorCartaMayor1 == valorCartaMayor2)
+                return null; // empate
+
+            return valorCartaMayor1 > valorCartaMayor2 ? jugador1 : jugador2;
+        }
+        return valorJugada1 < valorJugada2 ?  jugador1 : jugador2; 
+
+        //# Se analizan dos jugadores, de una vez si hay empate y retorna al ganador o null si es empate total;
+        //# Se analiza la carta más alta de entre las cartas que conforman la jugada.
+        /*
         int val1 = determinarMano(mano1);
         int val2 = determinarMano(mano2);
-        if (val1 > 100 && val2 > 100) { // condición para entrar a evaluar la carta más alta
+
+        if (val1 == val2) { // condición para entrar a evaluar la carta más alta.
+            val1 = cartaMasAlta(mano1);
+            val2 = cartaMasAlta(mano2);
+            
             if (val1 == val2)
-            ; //#Pendiente evaluar esta condición.
-            manoGanadora = val1 > val2 ? mano1 : mano2;
+                return 2;
+
+            manoGanadora = val1 > val2 ? 0 : 1;
             return manoGanadora;   
         }
 
-        manoGanadora = determinarMano(mano1) < determinarMano(mano2) ? mano1 : mano2;
+        manoGanadora = val1 < val2 ? 0 : 1;
         return manoGanadora;
+        */
     }
 
     /**
-     * Determina si la mano especificada corresponde a la de una jugada.
-     * @param mano lista de cartas
-     * @return el valor correspondiente de la mano.
+     * Determina la jugada correspondiente a la mano especificada.
+     * @param mano lista de cartas.
+     * @return un Pair que contiene el valor de la jugada y los valores de las cartas que componen la jugada.
      */
-    public static int determinarMano(List<Carta> mano) {
+    public static Pair <Integer, List<Integer>> determinarMano(List<Carta> mano) {
         ordenarMano(mano);
-        int valorMano = 11; //en caso de que la mano no corresponda a ninguna jugada.
+        Map<Integer, Integer> conteo = conteoCartas(mano);
 
-        if (escaleraReal(mano)) {
-            valorMano = 1;
-            return valorMano;
-        }
+        List<Integer> valoresMano = new ArrayList<Integer>();
+        Pair <Integer, List<Integer>> resultado = new Pair<Integer,List<Integer>>(null, null); 
 
-        if (poker(mano)) {
-            valorMano = 2;
-            return valorMano;
+        for (int i = 0; i<jugadas.length; i++) {
+            valoresMano = jugadas[i].comprobarMano(mano, conteo);
+            if (valoresMano != null) {
+                resultado.setFirst(i+1);
+                resultado.setSecond(valoresMano);
+                return resultado;
+            }
         }
-
-        if (escaleraColor(mano)) {
-            valorMano = 3;
-            return valorMano;
-        }
-        
-        if (full(mano)) {
-            valorMano = 4;
-            return valorMano;
-        }            
-
-        if (color(mano)) {
-            valorMano = 5;
-            return valorMano;
-        }
-        
-        if (escalera(mano)) {
-            valorMano = 6;
-            return valorMano;
-        }
-
-        if (trio(mano)) {
-            valorMano = 7;
-            return valorMano;
-        }
-
-        if (doblePareja(mano)) {
-            valorMano = 8;
-            return valorMano;
-        }
-
-        if (pareja(mano)) {
-            valorMano = 9;
-            return valorMano;
-        }
-
-        valorMano = cartaMasAlta(mano) + 100; // 
-        return valorMano;
+        return new Pair <Integer, List<Integer>>(10, getValoresMano(mano)); //en caso de que la mano corresponda a la jugada cartaMasAlta.
     }
 
     /**
-     * valor de la escaleraReal = 1.
-     * @return true si la mano es una escaler real.
+     * Verifica si la mano especificada corresponde a la jugada Escalera Real.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static boolean escaleraReal(List<Carta> mano) {
-        if (!color(mano))
-            return false;
+    private static List<Integer> escaleraReal(List<Carta> mano) {
+        if (color(mano) == null)
+            return null;
         for (int i = 0; i < 5; i++)
             if (mano.get(i).numero != i + 10)
-                return false;
-        return true;
+                return null;
+        return getValoresMano(mano);
     }
 
     /**
-     * 
-     * @param mano
-     * @return
+     * Verifica si la mano especificada corresponde a la jugada Poker.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static boolean poker(List<Carta> mano) {
-        Map<Carta, Integer> conteo = conteoDeCartas(mano);
-        for (Integer n : conteo.values())
-            if (n == 4)
-                return true;
-        return false;
+    private static List<Integer> poker(List<Carta> mano, Map<Integer, Integer> conteo) {
+        List<Integer> subMano = new ArrayList<Integer>();
+
+        for (Integer n : conteo.keySet())
+            if (conteo.get(n) == 4) {
+                //subMano.add(n);
+                return new ArrayList<Integer>() {
+                    {
+                        add(n);
+                    }
+                };
+            }
+        return null;
     }
 
-    //! falta la condicion para el AS
     /**
-     * 
+     * Verifica si la mano especificada corresponde a la jugada Escalera Color.
      * @param mano
-     * @return
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static boolean escaleraColor(List<Carta> mano) {
+    private static List<Integer> escaleraColor(List<Carta> mano) {
+        if (color(mano) == null)
+            return null;
+        return escalera(mano);
+    }
+
+    /**
+     * Verifica si la mano especificada corresponde a la jugada Full.
+     * @param mano
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
+     */
+    private static List<Integer> full(List<Carta> mano, Map<Integer, Integer> conteo) {
+        List<Integer> subMano = new ArrayList<Integer>();
+        boolean trio = false;
+        boolean par = false;
+
+        for (Integer n : conteo.keySet()) {
+            if (conteo.get(n) == 3) {
+                trio = true;
+                subMano.add(n);
+            }
+            else if (conteo.get(n) == 2) 
+                par = true;
+            
+            if (par && trio)
+                return subMano;
+        }
+        return null;
+    }
+
+    /**
+     * Verifica si la mano especificada corresponde a la jugada Color.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
+     */
+    private static List<Integer> color(List<Carta> mano) {
+        for (int i = 1; i < mano.size(); i++)
+            if (mano.get(i).palo != mano.get(0).palo)
+                return null;
+        return getValoresMano(mano);
+    }
+
+    /**
+     * Verifica si la mano especificada corresponde a la jugada Escalera.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
+     */
+    private static List<Integer> escalera(List<Carta> mano) {
         boolean flag = true;
-
-        if (!color(mano))
-            return false;
 
         for (int i = 0; i < 5; i++) {
             if (mano.get(i).numero != i + mano.get(0).numero) {
@@ -152,143 +202,127 @@ public class PokerRules {
             }
         }
 
-        if (flag) // La mano es una escalera color
-            return flag;
+        if (flag) // La mano es una escalera.
+            return getValoresMano(mano);
 
-        //# Condición para el AS.
+        //# Condicion para el AS.
 
-        flag = true;
-        //# Primer opcion -> K, A, 2, 3, 4 
-        for (int j = 0; j < mano.size(); j++) {
-            if (mano.get(1).numero != mano.get(0).numero + 1) {
-                flag =  false;
-                break;
+        //Hay que comprobar que antes del 2 haya un AS.
+        for (int j = 0; j<5; j++) {
+            if (j == 0) {
+                if (mano.get(j).numero-13 != 1)
+                    return null;
             }
-            else if (j >= 2) {
-                if (mano.get(j).numero != (j-2) + mano.get(2).numero) {
-                    flag = false;
-                    break;
-                }
+            else {
+                if (mano.get(j).numero != j+1) 
+                    return null;
             }
         }
-
-        if (flag) // La mano es una escalera color formada con As, Rey y 2.
-            return flag;
-
-        //# Segunda opcion -> J, Q, K, A, 2
-        for (int k = 0; k < 5; k++) {
-            if (mano.get(k).numero != k + mano.get(0).numero && k<4) 
-                return false;
-            else if (mano.get(k).numero != 2) 
-                return false;
-        }
-        return true; // La mano es una escalera color formada con As, Rey y 2.
+        return getValoresMano(mano);
     }
 
     /**
-     * 
-     * @param mano
-     * @return
-     */
-    private static boolean full(List<Carta> mano) {
-        Map<Carta, Integer> conteo = conteoDeCartas(mano);
-        for (Integer n : conteo.values())
-            if (n != 3 && n != 2)
-                return false;
-        return true;
-    }
-
-    /**
-     * Determina si las cartas de una lista son del mismo palo.
+     * Verifica si la mano especificada corresponde a la jugada Trio.
      * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static boolean color(List<Carta> mano) {
-        for (int i = 1; i < mano.size(); i++)
-            if (mano.get(i).palo != mano.get(0).palo)
-                return false;
-        return true;
-    }
+    private static List<Integer> trio(List<Carta> mano, Map<Integer, Integer> conteo) {
+        List<Integer> subMano = new ArrayList<Integer>();
 
-    //! falta la condicion para el AS
-    /**
-     * 
-     * @param mano
-     * @return
-     */
-    private static boolean escalera(List<Carta> mano) {
-        for (int i = 0; i < 5; i++)
-            if (mano.get(i).numero != i + mano.get(0).numero)
-                return false;
-        return true;
-    }
-
-    /**
-     * 
-     * @param mano
-     * @return
-     */
-    private static boolean trio(List<Carta> mano) {
-        Map<Carta, Integer> conteo = conteoDeCartas(mano);
-        for (Integer n : conteo.values())
-            if (n == 3)
-                return true;
-        return false;
-    }
-
-    /**
-     * 
-     * @param mano
-     * @return
-     */
-    private static boolean doblePareja(List<Carta> mano) {
-        Map<Carta, Integer> conteo = conteoDeCartas(mano);
-        int parejas = 0;
-        for (Integer n : conteo.values())
-            if (n == 2) {
-                parejas++;
-                if (parejas == 2)
-                    return true;
+        for (Integer n : conteo.keySet())
+            if (conteo.get(n) == 3) {
+                subMano.add(n);
+                return subMano;
             }
-        return false;
+        return null;
     }
 
     /**
-     * 
-     * @param mano
-     * @return
+     * Verifica si la mano especificada corresponde a la jugada Doble Pareja.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static boolean pareja(List<Carta> mano) {
-        Map<Carta, Integer> conteo = conteoDeCartas(mano);
-        for (Integer n : conteo.values())
-            if (n == 2)
-                return true;
-        return false;
+    private static List<Integer> doblePareja(List<Carta> mano, Map<Integer, Integer> conteo) {
+        List<Integer> subMano = new ArrayList<Integer>();
+
+        int parejas = 0;
+        for (Integer n : conteo.keySet())
+            if (conteo.get(n) == 2) {
+                parejas++;
+                subMano.add(n);
+                if (parejas == 2)
+                    return subMano;
+            }
+        return null;
     }
 
     /**
-     * 
-     * @param mano
-     * @return
+     * Verifica si la mano especificada corresponde a la jugada Pareja.
+     * @param mano lista de cartas.
+     * @return la lista de valores de las cartas si corresponde a la jugada, null en caso contrario.
      */
-    private static int cartaMasAlta(List<Carta> mano) {
+    private static List<Integer> pareja(List<Carta> mano, Map<Integer, Integer> conteo) {
+        List<Integer> subMano = new ArrayList<Integer>();
+
+        for (Integer n : conteo.keySet()) {
+            if (conteo.get(n) == 2) {
+                subMano.add(n);
+                return subMano;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retorna el maximo valor de una lista de enteros especificada.
+     * @param mano lista de los valores de las cartas que componen una jugada o la mano del jugador.
+     * @return el entero correspondiente a la carta mas alta.
+     */
+    private static int cartaMasAlta(List<Integer> valoresCartas) {
+        /*
         int max = 0;
-        for (Carta carta : mano)
-            if (carta.numero > max)
-                max = carta.numero;
+        for (Integer valor : valoresCartas)
+            if (valor > max)
+                max = valor;
         return max;
+        */
+        return Collections.max(valoresCartas);
     }
 
     // #---------------------------------------------------------------------------
     // # FUNCIONES AUXILIARES
     // #---------------------------------------------------------------------------
 
-    private static Map<Carta, Integer> conteoDeCartas(List<Carta> mano) {
-        Map<Carta, Integer> conteo = new HashMap<Carta, Integer>();
-        for (Carta carta : mano)
-            if (conteo.get(carta) == null)
-                conteo.put(carta, 0);
-            else
-                conteo.replace(carta, conteo.get(carta) + 1);
+    /**
+     * Crea una lista con los valores de las cartas de una mano.
+     * @param mano lista de cartas.
+     * @return una lista de enteros que corresponden a los valores de cada carta.
+     */
+    private static List<Integer> getValoresMano(List<Carta> mano) {
+        List<Integer> valoresMano = new ArrayList<Integer>();
+
+        for (Carta carta : mano) 
+            valoresMano.add(carta.numero);
+
+        return valoresMano;
+    }
+
+    /**
+     * Cuenta la cantidad de veces que se repite el valor de una carta.
+     * @param mano lista de cartas.
+     * @return un HashMap que contiene como clave el numero de carta y como valor la cantidad de cartas de ese numero.
+     */
+    private static Map<Integer, Integer> conteoCartas(List<Carta> mano) {
+        // El primer Integer es el numero de la carta y el segundo es la cantidad de cartas de ese numero
+        // no se tiene en cuenta el palo.
+        Map<Integer, Integer> conteo = new HashMap<Integer, Integer>();
+        
+        for (Carta carta : mano) {
+            if (conteo.get(carta.numero) == null)
+                conteo.put(carta.numero, 1);
+            else 
+                conteo.replace(carta.numero, (conteo.get(carta.numero)+1));
+        }
         return conteo;
     }
 

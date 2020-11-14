@@ -77,19 +77,12 @@ public class Jugador {
         manoPanel.descubrirCartas(mano);
     }
 
-    public void recibirMano(List<Carta> cartas) {
-        this.mano.clear();
-        this.mano = cartas;
-        manoPanel.descubrirCartas(mano);
-    }
-
     /**
-     * 
-     * @param ultimaRonda
-     * @return
+     * Simula la decision de apostar.
+     * @return el valor de la apuesta, 0 en caso de pasar sin apostar.
      * @throws InterruptedException
      */
-    public int apostar(boolean ultimaRonda) throws InterruptedException {
+    public int apostar() throws InterruptedException {
         if (tipo == TipoJugador.Usuario)
             return aportar(pokerView.apostar());
 
@@ -107,9 +100,10 @@ public class Jugador {
     }
 
     /**
-     * Simula la decision de apostar
-     * @param carrier valor para igualar la apuesta
-     * @return valor de la apuesta o null en caso de pasar, retirarse
+     * Simula la decision de apostar.
+     * @param carrier valor para igualar la apuesta.
+     * @param ultimaRonda true si es la ultima ronda, false en caso contrario.
+     * @return valor de la apuesta o 0 en caso de pasar, retirarse.
      * @throws InterruptedException
      */
     public int apostar(int valorParaIgualar, boolean ultimaRonda) throws InterruptedException {
@@ -143,7 +137,7 @@ public class Jugador {
     }
 
     /**
-     * Simula la decicison de retirarse.
+     * Simula la decision de retirarse.
      */
     public void retirarse() {
         mazo.descartar(mano);
@@ -153,8 +147,8 @@ public class Jugador {
     }
 
     /**
-     * Simula la decision de descartar
-     * @return lista de cartas a descartar
+     * Simula la decision de descartar.
+     * @return lista de cartas a descartar.
      * @throws InterruptedException
      */
     public void descartar() throws InterruptedException {
@@ -180,7 +174,7 @@ public class Jugador {
 
         List<Integer> cartas = IntStream.range(0, 5).boxed().collect(Collectors.toList());
         int cartasADesechar = aleatorio.nextInt(5);
-        int[] cartas2 = new int[cartasADesechar];
+        int[] cartas2 = new int[cartasADesechar]; //! Revisar.
 
         if (cartasADesechar == 0) {
             pokerView.showMessage(nombre + " continua sin descartar", TimeControl.tiempoDeDescarte);
@@ -204,17 +198,24 @@ public class Jugador {
     }
 
     /**
-     * determina si el jugador esta jugando.
-     * @return true si el jugador no se ha retirado.
+     * Determina si el jugador esta jugando.
+     * @return true si el jugador se ha retirado.
      */
     public boolean seHaRetirado() {
         return retirado;
     }
 
+    /**
+     * Muestra las cartas del jugador por medio de manoPanel.
+     */
     public void descubrirCartas() {
         manoPanel.descubrirCartas(mano);
     }
 
+    /**
+     * Agrega el dinero especificado al monto de dinero del jugador.
+     * @param dinero
+     */
     public void recibirDinero(int dinero) {
         this.dinero += dinero;
         pokerView.updateMoney(this);
@@ -256,6 +257,10 @@ public class Jugador {
     // # SETTERS
     // #---------------------------------------------------------------------------
 
+    /**
+     * Establece el panel asociado al jugador.
+     * @param manoPanel 
+     */
     public void setManoPanel(JManoPanel manoPanel) {
         this.manoPanel = manoPanel;
     }

@@ -19,6 +19,9 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * 
+ */
 public class JManoPanel extends JPanel {
 
     private List<JButton> JMano;
@@ -30,6 +33,10 @@ public class JManoPanel extends JPanel {
 
     private Escucha listener;
 
+    /**
+     * Instantiates a new JManoPanel.
+     * @param jugador
+     */
     public JManoPanel(Jugador jugador) {
         this.jugador = jugador;
         this.ordenarCartas = true;
@@ -71,12 +78,19 @@ public class JManoPanel extends JPanel {
     // # MÉTODOS
     // #---------------------------------------------------------------------------
 
+    /**
+     * Muestra el dinero del jugador por medio de un JLabel.
+     */
     public void mostrarDinero() {
         dinero.setText(jugador.getDinero().toString());
         revalidate();
         repaint();
     }
 
+    /**
+     * Muestra el contenido de las cartas del jugador.
+     * @param mano lista de cartas.
+     */
     public void descubrirCartas(List<Carta> mano) {
         for (int i = 0; i < JMano.size(); i++)
             JMano.get(i).setText(mano.get(i).numero + " " + mano.get(i).palo.toString().charAt(0));
@@ -103,8 +117,7 @@ public class JManoPanel extends JPanel {
     }
 
     /**
-     * 
-     * @return
+     * @return La lista de enteros que corresponden a la posicion de las cartas que el usuario ha seleccionado.
      */
     public List<Integer> getCartasSeleccionadas() {
         List<Integer> cartas = new ArrayList<Integer>();
@@ -143,7 +156,7 @@ public class JManoPanel extends JPanel {
     }
 
     /**
-     * @return 
+     * @return el entero correspondiente a la cantidad de cartas seleccionadas.
      */
     public int getCartasSeleccionadasSize() {
         return cartasSeleccionadas.size();
