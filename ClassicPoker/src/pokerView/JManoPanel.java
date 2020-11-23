@@ -7,9 +7,12 @@
 package pokerView;
 
 import classicPoker.*;
+import classicPoker.Jugador.TipoJugador;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,10 +26,12 @@ import java.awt.event.ActionListener;
  * 
  */
 public class JManoPanel extends JPanel {
-
     private List<JButton> JMano;
     private Jugador jugador;
     private JLabel nombre, dinero;
+    private boolean isHuman;
+    private Dimension JCartaSize;
+    private Dimension panelSize;
 
     private Boolean ordenarCartas;
     private List<JButton> cartasSeleccionadas;
@@ -41,6 +46,10 @@ public class JManoPanel extends JPanel {
         this.jugador = jugador;
         this.ordenarCartas = true;
         this.cartasSeleccionadas = new ArrayList<JButton>();
+        this.isHuman = (jugador.getTipo() == TipoJugador.Usuario) ? true : false;
+        this.JCartaSize = (isHuman) ? new Dimension(88, 132) : new Dimension(58, 88); // base: 350x530
+        this.panelSize = (isHuman) ? new Dimension(650, 155) : new Dimension(325, 135);
+        this.setOpaque(false);
 
         JMano = new ArrayList<JButton>();
 
@@ -51,25 +60,30 @@ public class JManoPanel extends JPanel {
     }
 
     private void initGUI() {
+        this.setPreferredSize(panelSize);
+        //this.setBackground(Color.ORANGE);
+
         listener = new Escucha();
 
         nombre = new JLabel(jugador.getName());
         dinero = new JLabel(Integer.toString(jugador.getDinero()));
 
+        nombre.setFont(Resources.Casino.deriveFont(16f));
+        dinero.setFont(Resources.Casino.deriveFont(16f));
+
         this.add(nombre);
+        if (!isHuman)
+            this.add(Box.createRigidArea(new Dimension(245, 0)));
         this.add(dinero);
 
         for (JButton JCarta : JMano) {
-            if (jugador.getTipo() != Jugador.TipoJugador.Usuario) {
-                JCarta.setSize(new Dimension(70, 80));
-                JCarta.setMinimumSize(new Dimension(70, 80));
-                JCarta.setPreferredSize(new Dimension(70, 80));
-            } else {
-                JCarta.setSize(new Dimension(100, 120));
-                JCarta.setMinimumSize(new Dimension(100, 120));
-                JCarta.setPreferredSize(new Dimension(100, 120));
+            JCarta.setSize(JCartaSize);
+            JCarta.setMinimumSize(JCartaSize);
+            JCarta.setPreferredSize(JCartaSize);
+            JCarta.setContentAreaFilled(false);
+            JCarta.setBorder(null);
+            if (isHuman)
                 JCarta.addActionListener(listener);
-            }
             this.add(JCarta);
         }
     }
@@ -93,7 +107,7 @@ public class JManoPanel extends JPanel {
      */
     public void descubrirCartas(List<Carta> mano) {
         for (int i = 0; i < JMano.size(); i++)
-            JMano.get(i).setText(mano.get(i).numero + " " + mano.get(i).palo.toString().charAt(0));
+            JMano.get(i).setIcon(CardImage.get(mano.get(i), JCartaSize));
     }
 
     public void taparCartas() {
@@ -173,7 +187,7 @@ public class JManoPanel extends JPanel {
     private void onJCartaClick(JButton JCarta) {
 
         if (ordenarCartas) {
-            if (cartasSeleccionadas.size() == 0) 
+            if (cartasSeleccionadas.size() == 0)
                 cartasSeleccionadas.add(JCarta);
             else if (cartasSeleccionadas.size() == 1) {
                 int index1 = JMano.indexOf(cartasSeleccionadas.get(0));
@@ -181,12 +195,10 @@ public class JManoPanel extends JPanel {
                 jugador.cambiarCartas(index1, index2);
                 cartasSeleccionadas.clear();
             }
-        } 
-        else if (cartasSeleccionadas.indexOf(JCarta) != -1) {
+        } else if (cartasSeleccionadas.indexOf(JCarta) != -1) {
             cartasSeleccionadas.remove(JCarta);
             JCarta.setBackground(null);
-        }
-        else {
+        } else {
             cartasSeleccionadas.add(JCarta);
             JCarta.setBackground(Color.WHITE);
         }

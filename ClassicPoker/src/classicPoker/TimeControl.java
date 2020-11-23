@@ -10,6 +10,8 @@ package classicPoker;
  * 
  */
 public class TimeControl {
+    public static final int LOADING = 100;
+
     public static final int apuestaInicial = 1000;
     public static final int rondaDeApuesta = 1000;
     public static final int jugadorPensadoSuApuesta = 500;

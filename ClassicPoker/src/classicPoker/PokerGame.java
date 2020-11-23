@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.UIManager;
 import java.awt.EventQueue;
 
@@ -51,6 +52,10 @@ public class PokerGame implements Runnable {
         jugadores.add(new Jugador(getRandomMoney(), Jugador.TipoJugador.Simulado, mazo, "P4"));
         jugadores.add(new Jugador(getRandomMoney(), Jugador.TipoJugador.Usuario, mazo, "User"));
 
+        CardImage.loadImage(getClass().getResource("/images/cards.png"));
+        Resources.loadCasino(getClass().getResourceAsStream("/fonts/CasinoFlat.ttf"));
+        Resources.loadLounge(getClass().getResourceAsStream("/fonts/LoungeBait-JpVa.ttf"));
+
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -68,8 +73,12 @@ public class PokerGame implements Runnable {
     @Override
     public void run() {
         try {
+            Thread.sleep(TimeControl.LOADING);
+
             while (pokerView == null)
                 Thread.sleep(100);
+
+            pokerView.initGUI();
 
             iniciarRonda();
         } catch (Exception e) {
@@ -129,10 +138,10 @@ public class PokerGame implements Runnable {
         //    jugadores.get(i).recibirCartas(mazo.sacarCartas(5));
 
         // Por defecto.
-        
+
         for (Jugador jugador : jugadores)
             jugador.recibirCartas(mazo.sacarCartas(5));
-                
+
     }
 
     /**
@@ -200,7 +209,7 @@ public class PokerGame implements Runnable {
      */
     private void determinarJuego() throws InterruptedException {
         //Map <Jugador, Integer> valores = new HashMap<Jugador, Integer>();
-        List <Jugador> ganadores = new ArrayList<Jugador>();
+        List<Jugador> ganadores = new ArrayList<Jugador>();
 
         //# Determinar ganador/ganadores
         //int valorGanador = 100;
@@ -213,27 +222,25 @@ public class PokerGame implements Runnable {
         }
         */
         Jugador auxiliar;
-        for (int i = 0; i < jugadores.size()-1; i++) {
-            if (i == 0) 
+        for (int i = 0; i < jugadores.size() - 1; i++) {
+            if (i == 0)
                 auxiliar = PokerRules.determinarMano(jugadores.get(0), jugadores.get(1));
-            
-            else 
-                auxiliar = PokerRules.determinarMano(ganadores.get(ganadores.size()-1), jugadores.get(i+1));
+
+            else
+                auxiliar = PokerRules.determinarMano(ganadores.get(ganadores.size() - 1), jugadores.get(i + 1));
 
             if (auxiliar != null) { // Posible único ganador.
                 ganadores.add(auxiliar);
                 if (ganadores.size() > 1) { // eliminar los posibles ganadores anteriores.
-                    for (int j = ganadores.size()-2; j >= 0; j--) 
+                    for (int j = ganadores.size() - 2; j >= 0; j--)
                         ganadores.remove(j);
                 }
-            }
-            else if (auxiliar == null) { // empate, se agregan los dos jugadores a la lista de ganadores.
+            } else if (auxiliar == null) { // empate, se agregan los dos jugadores a la lista de ganadores.
                 if (i == 0) {
                     ganadores.add(jugadores.get(0));
                     ganadores.add(jugadores.get(1));
-                }
-                else 
-                    ganadores.add(jugadores.get(i+1)); 
+                } else
+                    ganadores.add(jugadores.get(i + 1));
             }
         }
 
@@ -252,14 +259,12 @@ public class PokerGame implements Runnable {
             if (ganadores.get(0).getTipo() == TipoJugador.Simulado) {
                 pokerView.showBigMessage("¡El jugador " + ganadores.get(0).getName() + " ha ganado!");
                 pokerView.showMessage("recibe " + dineroARecibir, 0);
-            }
-            else {
+            } else {
                 pokerView.showBigMessage("¡Has ganado!");
                 pokerView.showMessage("Recibes " + dineroARecibir, 0);
             }
-            ganadores.get(0).recibirDinero(dineroARecibir); 
-        }
-        else {
+            ganadores.get(0).recibirDinero(dineroARecibir);
+        } else {
             String nombres = "";
             dineroARecibir /= ganadores.size();
 
@@ -270,9 +275,9 @@ public class PokerGame implements Runnable {
             pokerView.showBigMessage("Los jugadores " + nombres + "han ganado!");
             pokerView.showMessage("Recibe " + dineroARecibir + " cada uno", 0);
         }
-            
-        for (Jugador p : jugadores) 
-            mesaDeApuesta.replace(p, 0); 
+
+        for (Jugador p : jugadores)
+            mesaDeApuesta.replace(p, 0);
     }
 
     /**
@@ -335,20 +340,19 @@ public class PokerGame implements Runnable {
     }
 
     /**
-	 * The main method.
-	 *
-	 * @param args the arguments
-	 */
-	public static void main(String[] args) {
+     * The main method.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
 
-		
         try {
-			String className = UIManager.getCrossPlatformLookAndFeelClassName();
-			UIManager.setLookAndFeel(className);
-		} catch (Exception e) {
-		}
+            String className = UIManager.getCrossPlatformLookAndFeelClassName();
+            UIManager.setLookAndFeel(className);
+        } catch (Exception e) {
+        }
 
-		Thread pokerGame = new Thread(new PokerGame());
+        Thread pokerGame = new Thread(new PokerGame());
         pokerGame.start();
-	}
+    }
 }

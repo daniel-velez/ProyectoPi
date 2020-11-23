@@ -8,6 +8,7 @@
 package pokerView;
 
 import classicPoker.*;
+import java.awt.Cursor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
 
 /**
  * Clase encargada de representar el juego y de realizar las operaciones de E/S
@@ -43,11 +46,11 @@ public class PokerView extends JFrame {
     private List<Jugador> jugadores;
     private Map<Jugador, JManoPanel> playersView;
     private JLabel textBig, textSmall;
+    private boolean loading;
 
     private List<JButton> fichas;
     private JButton apostar, pasar, igualar, aumentar, descartar;
     private JButton retirarse, ayuda, levantarse, saltar;
-    private JPanel fichasPanel, opcionesPanel;
 
     private Jugador jugador;
     private int apuestaDelJugador;
@@ -59,7 +62,6 @@ public class PokerView extends JFrame {
      * Instantiates a new poker view.
      */
     public PokerView(List<Jugador> jugadores) {
-
         this.jugadores = jugadores;
         this.instrucciones = new JInstruccionesPanel();
 
@@ -67,26 +69,60 @@ public class PokerView extends JFrame {
             if (jugador.getTipo() == Jugador.TipoJugador.Usuario)
                 this.jugador = jugador;
 
-        initGUI();
+        loading = true;
 
         this.setTitle("Classic Poker");
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
-        this.pack();
+        this.setSize(new Dimension(1031, 607));
+        //this.pack();
         this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+
+    /**
+     * Muestra una imagen de fondo al inicio del juego.
+     *
+     * @param g 
+     */
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (loading)
+            g.drawImage(getImage("splash.png").getImage(), 0, 30, getWidth(), getHeight() - 30, this);
+    }
+
+    /**
+     * Inits the content pane.
+     */
+    private void initContentPane() {
+        JPanel contentPane = new JPanel() {
+            public void paintComponent(Graphics g) {
+                g.drawImage(getImage("background.png").getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        contentPane.setBorder(new EmptyBorder(14, 0, 5, 0));
+        this.setContentPane(contentPane);
     }
 
     /**
      * Inits the GUI.
      */
-    private void initGUI() {
-        this.setLayout(new GridLayout(4, 1));
-        JPanel rowPane = new JPanel();
-        JPanel colPane = new JPanel();
-        fichasPanel = new JPanel();
-        opcionesPanel = new JPanel();
+    public void initGUI() {
+        loading = false;
+        initContentPane();
+        this.setLayout(new BorderLayout());
+        JPanel botonesPanel = new JPanel(new BorderLayout());
+        JPanel userInfo = new JPanel(), fichasPanel = new JPanel(), opcionesPanel = new JPanel();
         listener = new Escucha();
+        textBig = new JLabel();
+        textSmall = new JLabel();
+        List<JManoPanel> playersView2 = new ArrayList<JManoPanel>();
+
+        botonesPanel.setOpaque(false);
+        fichasPanel.setOpaque(false);
+        userInfo.setOpaque(false);
+        opcionesPanel.setOpaque(false);
 
         // # Vista de los jugadores
 
@@ -94,70 +130,35 @@ public class PokerView extends JFrame {
         for (Jugador jugador : jugadores) {
             playersView.put(jugador, new JManoPanel(jugador));
             jugador.setManoPanel(playersView.get(jugador));
+            playersView2.add(playersView.get(jugador));
         }
 
-        rowPane.setLayout(new FlowLayout());
-        add(rowPane);
+        add(new GameTable(playersView2, textBig, textSmall), BorderLayout.CENTER);
 
-        rowPane.add(playersView.get(jugadores.get(1)));
-        rowPane.add(Box.createRigidArea(new Dimension(50, 0)));
-        rowPane.add(playersView.get(jugadores.get(2)));
+        // #-------------------------------
 
-        // # Indicaciones
+        userInfo.setLayout(new BoxLayout(userInfo, BoxLayout.PAGE_AXIS));
+        setComponentSize(userInfo, new Dimension(300, 112));
+        userInfo.add(Box.createRigidArea(new Dimension(50, 0)));
+        userInfo.add(playersView.get(jugadores.get(4)).getUserName());
+        userInfo.add(playersView.get(jugadores.get(4)).getUserMoney());
+        botonesPanel.add(userInfo, BorderLayout.LINE_START);
 
-        rowPane = new JPanel();
-        rowPane.setLayout(new FlowLayout());
-        add(rowPane);
-        rowPane.add(playersView.get(jugadores.get(0)));
-
-        colPane.setLayout(new BoxLayout(colPane, BoxLayout.PAGE_AXIS));
-        textBig = new JLabel("textBig");
-        textSmall = new JLabel("textSmall");
-
-        textBig.setPreferredSize(new Dimension(200, 40));
-        // textBig.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        colPane.add(textBig);
-
-        textSmall.setPreferredSize(new Dimension(400, 40));
-        // textSmall.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        colPane.add(textSmall);
-
-        rowPane.add(colPane);
-        rowPane.add(playersView.get(jugadores.get(3)));
-
-        // # Usuario
-
-        rowPane = new JPanel();
-        rowPane.setLayout(new FlowLayout());
-        add(rowPane);
-        rowPane.add(playersView.get(jugadores.get(4)));
-
-        rowPane = new JPanel();
-        rowPane.setLayout(new BorderLayout());
-        add(rowPane);
-
-        colPane = new JPanel();
-        colPane.setLayout(new BoxLayout(colPane, BoxLayout.PAGE_AXIS));
-
-        colPane.add(playersView.get(jugadores.get(4)).getUserName());
-        colPane.add(playersView.get(jugadores.get(4)).getUserMoney());
-        rowPane.add(colPane, BorderLayout.LINE_START);
-
-        // # Botones
+        // # Fichas
 
         fichas = new ArrayList<JButton>();
 
-        fichas.add(new JButton("100"));
-        fichas.add(new JButton("200"));
-        fichas.add(new JButton("500"));
-        fichas.add(new JButton("1000"));
+        fichas.add(new JButton(new ImageIcon(getClass().getResource("/images/f100.png"))));
+        fichas.add(new JButton(new ImageIcon(getClass().getResource("/images/f200.png"))));
+        fichas.add(new JButton(new ImageIcon(getClass().getResource("/images/f500.png"))));
+        fichas.add(new JButton(new ImageIcon(getClass().getResource("/images/f1000.png"))));
 
         for (JButton ficha : fichas) {
             configurarBoton(ficha, listener);
-            ficha.setEnabled(false);
+            //ficha.setEnabled(false);
             fichasPanel.add(ficha);
         }
-        rowPane.add(fichasPanel, BorderLayout.CENTER);
+        botonesPanel.add(fichasPanel, BorderLayout.CENTER);
 
         apostar = new JButton("Apostar");
         pasar = new JButton("Pasar");
@@ -177,6 +178,7 @@ public class PokerView extends JFrame {
         opcionesPanel.add(retirarse);
         opcionesPanel.add(levantarse);
         opcionesPanel.add(ayuda);
+        setComponentSize(opcionesPanel, new Dimension(300, 112));
 
         igualar.addActionListener(listener);
         aumentar.addActionListener(listener);
@@ -193,7 +195,11 @@ public class PokerView extends JFrame {
         retirarse.setVisible(false);
         descartar.setVisible(false);
 
-        rowPane.add(opcionesPanel, BorderLayout.LINE_END);
+        botonesPanel.add(opcionesPanel, BorderLayout.LINE_END);
+
+        add(botonesPanel, BorderLayout.PAGE_END);
+
+        this.pack();
     }
 
     // #---------------------------------------------------------------------------
@@ -394,8 +400,9 @@ public class PokerView extends JFrame {
      * @param escucha el escucha de los eventos
      */
     private void configurarBoton(JButton boton, Escucha escucha) {
-        // boton.setBorder(null);
-        // boton.setContentAreaFilled(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setContentAreaFilled(false);
         boton.addActionListener(escucha);
     }
 
@@ -406,6 +413,21 @@ public class PokerView extends JFrame {
     private void quitarFichas(boolean flag) {
         for (JButton ficha : fichas)
             ficha.setEnabled(!flag);
+    }
+
+    private void setComponentSize(JPanel obj, Dimension size) {
+        obj.setPreferredSize(size);
+        obj.setMinimumSize(size);
+        obj.setMaximumSize(size);
+    }
+
+    /**
+     * Crea un ImageIcon cargando la imagen especificada. 
+     * @param name el nombre de la imagen.
+     * @return un ImageIcon
+     */
+    private ImageIcon getImage(String name) {
+        return new ImageIcon(this.getClass().getResource("/images/" + name));
     }
 
     // #---------------------------------------------------------------------------
