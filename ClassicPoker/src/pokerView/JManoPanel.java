@@ -80,6 +80,7 @@ public class JManoPanel extends JPanel {
             JCarta.setSize(JCartaSize);
             JCarta.setMinimumSize(JCartaSize);
             JCarta.setPreferredSize(JCartaSize);
+            JCarta.setIcon(isHuman ? CardImage.cartaTapadaMax : CardImage.cartaTapada);
             JCarta.setContentAreaFilled(false);
             JCarta.setBorder(null);
             if (isHuman)

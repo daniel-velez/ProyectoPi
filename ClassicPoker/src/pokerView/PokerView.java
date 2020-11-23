@@ -73,6 +73,7 @@ public class PokerView extends JFrame {
 
         this.setTitle("Classic Poker");
         this.setResizable(false);
+        this.setIconImage(getImage("icon.png").getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(new Dimension(1031, 607));
         //this.pack();

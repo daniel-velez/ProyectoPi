@@ -15,6 +15,7 @@ import java.net.URL;
 
 public class CardImage {
     private static BufferedImage cardsImage;
+    public static ImageIcon cartaTapada, cartaTapadaMax;
     private static final int top = 23;
     private static final int left = 10;
 
@@ -24,9 +25,11 @@ public class CardImage {
     private static final int verticalSpace = 8;
     private static final int horizontalSpace = 11;
 
-    public static void loadImage(URL src) {
+    public static void loadImage(Object obj) {
         try {
-            cardsImage = ImageIO.read(src);
+            cartaTapada = new ImageIcon(obj.getClass().getResource("/images/carta-tapada.png"));
+            cartaTapadaMax = new ImageIcon(obj.getClass().getResource("/images/carta-tapada.max.png"));
+            cardsImage = ImageIO.read(obj.getClass().getResource("/images/cards.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

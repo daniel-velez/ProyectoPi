@@ -52,7 +52,7 @@ public class PokerGame implements Runnable {
         jugadores.add(new Jugador(getRandomMoney(), Jugador.TipoJugador.Simulado, mazo, "P4"));
         jugadores.add(new Jugador(getRandomMoney(), Jugador.TipoJugador.Usuario, mazo, "User"));
 
-        CardImage.loadImage(getClass().getResource("/images/cards.png"));
+        CardImage.loadImage(this);
         Resources.loadCasino(getClass().getResourceAsStream("/fonts/CasinoFlat.ttf"));
         Resources.loadLounge(getClass().getResourceAsStream("/fonts/LoungeBait-JpVa.ttf"));
 
